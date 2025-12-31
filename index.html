@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kandang Lembu Kembar - Pusat Sapi Kurban</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* --- RESET & VARIABLES --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* --- LIGHT THEME VARIABLES (DEFAULT) --- */
+        :root {
+            /* Tema Warna Alam & Modern */
+            --primary: #10b981; /* Emerald Green */
+            --primary-dark: #059669;
+            --secondary: #d97706; /* Amber/Gold */
+            --sidebar-bg: #0e1318;
+            --topbar-bg: #ffffff;
+            --workspace-bg: #f3f4f6;
+            --panel-bg: #ffffff;
+            --text-dark: #1f2937;
+            --text-light: #9ca3af;
+            --selection-border: #10b981;
+            --handle-color: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --success: #10b981;
+        }
+
+        /* --- DARK THEME VARIABLES --- */
+        [data-theme="dark"] {
+            --primary: #34d399;
+            --primary-dark: #10b981;
+            --secondary: #fbbf24;
+            --sidebar-bg: #050505;
+            --topbar-bg: #1f2937;
+            --workspace-bg: #111827;
+            --panel-bg: #1f2937;
+            --text-dark: #f3f4f6;
+            --text-light: #9ca3af;
+            --selection-border: #34d399;
+            --handle-color: #ffffff;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            --success: #34d399;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--workspace-bg);
+            color: var(--text-dark);
+            height: 100vh;
+            overflow: hidden;
+            display: flex; /* Default Flexbox (Row) agar sidebar muncul di kiri */
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* --- BACKGROUND PATTERN (DOT GRID) --- */
+        .bg-pattern {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: radial-gradient(var(--text-light) 1px, transparent 1px);
+            background-size: 20px 20px;
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.1;
+        }
+
+        /* --- SIDEBAR (LEFT) --- */
+        .sidebar {
+            width: 72px;
+            background-color: var(--sidebar-bg);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 1rem;
+            flex-shrink: 0;
+            z-index: 100;
+            transition: width 0.3s ease;
+        }
+
+        .sidebar-logo {
+            color: var(--primary); /* Logo warna hijau */
+            font-size: 1.8rem;
+            margin-bottom: 2rem;
+            cursor: pointer;
+        }
+
+        .nav-item {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--white);
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            left: -16px;
+            top: 50%;
+            transform: translateY(-50%);
+            height: 20px;
+            width: 4px;
+            background-color: var(--primary);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .nav-tooltip {
+            position: absolute;
+            left: 60px;
+            background: var(--text-dark);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+
+        .nav-item:hover .nav-tooltip {
+            opacity: 1;
+        }
+
+        /* --- MAIN AREA --- */
+        .main-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- TOP BAR --- */
+        .top-bar {
+            height: 56px;
+            background-color: var(--topbar-bg);
+            border-bottom: 1px solid var(--text-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1.5rem;
+            flex-shrink: 0;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .project-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .project-title {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-canva {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            color: var(--text-dark);
+        }
+        .btn-ghost:hover { background: rgba(255, 255, 255, 0.1); }
+
+        .btn-primary {
+            background: linear-gradient(90deg, #d97706 0%, #f59e0b 100%); /* Amber Gradient */
+            color: white;
+            box-shadow: 0 2px 4px rgba(217, 119, 6, 0.3);
+        }
+        .btn-primary:hover {
+            box-shadow: 0 4px 8px rgba(217, 119, 6, 0.4);
+            transform: translateY(-1px);
+        }
+
+        /* --- WORKSPACE / SCROLLABLE AREA --- */
+        .workspace {
+            flex: 1;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+            scroll-behavior: smooth;
+        }
+
+        /* --- VIEW MANAGER --- */
+        .view-section {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .hidden { display: none !important; }
+
+        .canvas-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            gap: 3rem;
+            padding-bottom: 2rem;
+        }
+
+        /* --- ARTBOARD (HERO) --- */
+        .artboard {
+            background: var(--panel-bg);
+            box-shadow: var(--shadow-lg);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            transition: box-shadow 0.3s ease, background-color 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 4rem 2rem;
+            cursor: default;
+            border: 1px solid var(--text-light);
+        }
+
+        .draggable-wrapper {
+            position: relative;
+            padding: 4px;
+            cursor: move;
+            border: 2px dashed transparent;
+            transition: all 0.2s;
+            max-width: 100%;
+        }
+
+        .draggable-wrapper:hover {
+            border: 2px dashed var(--primary);
+            background: rgba(16, 185, 129, 0.05);
+        }
+
+        .resize-handle {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: white;
+            border: 2px solid var(--primary);
+            border-radius: 50%;
+            display: none;
+            z-index: 10;
+        }
+        .draggable-wrapper:hover .resize-handle { display: block; }
+
+        .rh-tl { top: -4px; left: -4px; }
+        .rh-tr { top: -4px; right: -4px; }
+        .rh-bl { bottom: -4px; left: -4px; }
+        .rh-br { bottom: -4px; right: -4px; }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+            pointer-events: none;
+        }
+
+        .hero-desc {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            margin-bottom: 2rem;
+            max-width: 600px;
+            pointer-events: none;
+        }
+
+        .element-tag {
+            position: absolute;
+            top: -24px;
+            left: 0;
+            background: var(--primary);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        .draggable-wrapper:hover .element-tag { opacity: 1; }
+
+
+        /* --- TEMPLATES (KATALOG SAPI) --- */
+        .section-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .section-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .template-scroller {
+            display: flex;
+            gap: 1.5rem;
+            overflow-x: auto;
+            padding-bottom: 1rem;
+            scrollbar-width: thin;
+            scrollbar-color: var(--text-light) transparent;
+        }
+
+        .template-card {
+            min-width: 280px;
+            background: var(--panel-bg);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+            position: relative;
+            border: 1px solid transparent;
+            transition: background-color 0.3s ease;
+        }
+
+        .template-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--primary);
+        }
+
+        .template-preview {
+            height: 180px;
+            background: #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 3rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .template-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .template-card:hover .template-preview img {
+            transform: scale(1.05);
+        }
+
+        .template-info {
+            padding: 1rem;
+        }
+
+        .template-info h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .template-info p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 0.8rem;
+            line-height: 1.4;
+        }
+
+        .template-action {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .price-tag {
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+        
+        /* Detail Button */
+        .btn-detail {
+            color: var(--text-light);
+            background: rgba(0,0,0,0.05);
+            padding: 6px;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 1px solid var(--text-light);
+            transition: all 0.2s;
+        }
+        .btn-detail:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* --- PROPERTIES PANEL (SPESIFIKASI) --- */
+        .panel-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+        }
+
+        .content-panel {
+            background: var(--panel-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            transition: background-color 0.3s ease;
+        }
+
+        .properties-sidebar {
+            background: var(--panel-bg);
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow-sm);
+            height: fit-content;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-group-canva {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group-canva label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: var(--text-dark);
+        }
+
+        .input-canva {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border: 1px solid var(--text-light);
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+            background-color: var(--panel-bg);
+            color: var(--text-dark);
+        }
+
+        .input-canva:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1);
+        }
+
+        .property-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-light);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--text-light);
+        }
+
+        /* --- TESTIMONIALS (PELANGGAN) --- */
+        .color-grid {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .testimonial-swatch {
+            width: 100%;
+            background: var(--panel-bg);
+            border: 1px solid var(--text-light);
+            border-radius: 8px;
+            padding: 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .swatch-header {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .swatch-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        /* --- CHECKOUT STYLES --- */
+        .checkout-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--panel-bg);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1.5fr 1fr;
+            min-height: 400px;
+            transition: background-color 0.3s ease;
+        }
+
+        .checkout-form {
+            padding: 2rem;
+            border-right: 1px solid var(--text-light);
+        }
+
+        .checkout-summary {
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.03);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .summary-row { display: flex; justify-content: space-between; margin-bottom: 0.8rem; font-size: 0.9rem; color: var(--text-dark); }
+        .total-row {
+            border-top:1px solid var(--text-light); margin-top: 1rem; padding-top: 1rem;
+            display: flex; justify-content: space-between; font-weight: 700; font-size: 1.1rem; color: var(--text-dark);
+        }
+
+        .btn-pay {
+            width: 100%; padding: 1rem; border: none; border-radius: 8px;
+            background: linear-gradient(90deg, #d97706 0%, #10b981 100%); color: white;
+            font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; margin-top: 1rem;
+        }
+        .btn-pay:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15); }
+
+        /* --- MODAL DETAIL --- */
+        .detail-modal-card {
+            background: var(--panel-bg); padding: 2rem; border-radius: 12px; text-align: left; max-width: 450px;
+            transform: scale(0.8); transition: 0.3s;
+        }
+        .detail-modal-overlay.show .detail-modal-card { transform: scale(1); }
+        .detail-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid var(--text-light); padding-bottom: 1rem;
+        }
+        .detail-title {
+            font-size: 1.5rem; font-weight: 700; color: var(--text-dark); margin: 0;
+        }
+        .detail-close {
+            background: none; border: none; font-size: 1.5rem; color: var(--text-light); cursor: pointer;
+        }
+        .detail-close:hover { color: var(--text-dark); }
+        
+        .detail-spec-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .spec-label {
+            font-weight: 600; color: var(--text-light); font-size: 0.9rem;
+        }
+        .spec-value {
+            font-weight: 700; color: var(--text-dark); font-size: 1.1rem;
+            text-align: right;
+        }
+        .detail-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+
+        /* --- MODAL SUCCESS --- */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
+            z-index: 1000; opacity: 0; pointer-events: none; transition: 0.3s;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        .modal-card {
+            background: var(--panel-bg); padding: 2.5rem; border-radius: 12px; text-align: center; max-width: 400px;
+            transform: scale(0.8); transition: 0.3s;
+        }
+        .modal-overlay.show .modal-card { transform: scale(1); }
+        .success-icon {
+            width: 80px; height: 80px; background: #d1fae5; color: var(--success);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; margin: 0 auto 1.5rem;
+        }
+
+        /* --- GLOBAL FOOTER --- */
+        .site-footer {
+            background-color: var(--sidebar-bg);
+            color: white;
+            padding: 3rem 2rem 2rem;
+            margin-top: 4rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            /* Ensure footer is separate from views but inside workspace for scroll */
+            flex-shrink: 0; 
+        }
+
+        .footer-grid {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-col h4 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .footer-col p, .footer-col a {
+            color: #d1d5db;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            margin-bottom: 0.5rem;
+            text-decoration: none;
+            display: block;
+            transition: color 0.2s;
+        }
+
+        .footer-col a:hover {
+            color: var(--primary);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .social-links a {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s;
+        }
+
+        .social-links a:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .copyright {
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 1.5rem;
+            font-size: 0.8rem;
+            color: #9ca3af;
+        }
+
+        /* --- FLOATING WHATSAPP --- */
+        .floating-wa-group {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 2000;
+            align-items: flex-end;
+        }
+
+        .floating-wa {
+            background: #25D366;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-decoration: none;
+        }
+
+        .floating-wa:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+        }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 1024px) {
+            .panel-row, .checkout-container { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 60px;
+                flex-direction: row;
+                justify-content: space-around;
+                padding-top: 0;
+                border-top: 1px solid #333;
+            }
+
+            .sidebar-logo { display: none; }
+            .nav-item { margin-bottom: 0; }
+            .nav-item.active::after {
+                width:20px;
+                height: 4px;
+                top: -6px;
+                left: 50%;
+                transform: translateX(-50%);
+            }
+            .nav-tooltip { display: none; }
+
+            .main-wrapper { padding-bottom: 60px; }
+            .workspace { padding: 1rem; }
+            .hero-title { font-size: 2rem; }
+            
+            /* Adjust Floating WA Group for mobile sidebar */
+            .floating-wa-group {
+                bottom: 80px; /* Above bottom nav */
+                right: 20px;
+            }
+            
+            .floating-wa {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+
+            /* Add margin to footer so it doesn't hide behind bottom nav on short pages */
+            .site-footer {
+                margin-bottom: 60px;
+            }
+        }
+
+        /* Utility */
+        .text-gradient {
+            background: linear-gradient(90deg, #d97706, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .badge-pro {
+            background: #d1fae5;
+            color: #047857;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-left: 8px;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
+        }
+        .toast {
+            background: #1f2937;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-top: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div class="bg-pattern"></div>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-logo">
+            <i class="fas fa-cow"></i>
+        </div>
+
+        <div class="nav-item active" onclick="switchTab(this, 'home')">
+            <i class="fas fa-home"></i>
+            <span class="nav-tooltip">Beranda</span>
+        </div>
+
+        <div class="nav-item" onclick="switchTab(this, 'templates')">
+            <i class="fas fa-th-large"></i>
+            <span class="nav-tooltip">Katalog Sapi</span>
+        </div>
+
+        <div class="nav-item" onclick="switchTab(this, 'recent')">
+            <i class="fas fa-clipboard-list"></i>
+            <span class="nav-tooltip">Pesanan</span>
+        </div>
+    </aside>
+
+    <!-- MAIN WRAPPER -->
+    <main class="main-wrapper">
+        <!-- TOP BAR -->
+        <header class="top-bar">
+            <div class="project-info">
+                <i class="fas fa-chevron-left" style="color: var(--text-light); cursor: pointer;" onclick="goHome()"></i>
+                <div class="project-title">
+                    <span id="pageTitle">Kandang Lembu Kembar</span>
+                    <i class="fas fa-pen" style="font-size: 0.8rem; color: var(--text-light); margin-left: 8px;"></i>
+                </div>
+            </div>
+
+            <div class="project-actions">
+                <button class="btn-canva btn-ghost" onclick="toggleTheme()" id="themeToggleBtn">
+                    <i class="fas fa-moon" id="themeIcon"></i>
+                </button>
+
+                <!-- UPDATE: 2 Tombol WhatsApp di Top Bar -->
+                <div style="display: flex; gap: 0.5rem;">
+                    <a href="https://wa.me/6285893107859?text=Halo%20Mahmud,%20saya%20tertarik%20membeli%20sapi%20kurban." 
+                       target="_blank" 
+                       class="btn-canva btn-primary"
+                       style="flex: 1; justify-content: center; font-size: 0.75rem; padding: 0.5rem 0.5rem;">
+                        <i class="fab fa-whatsapp"></i> Mahmud
+                    </a>
+                    <a href="https://wa.me/6289687552388?text=Halo%20Ahmad,%20saya%20tertarik%20membeli%20sapi%20kurban." 
+                       target="_blank" 
+                       class="btn-canva btn-primary"
+                       style="flex: 1; justify-content: center; font-size: 0.75rem; padding: 0.5rem 0.5rem; background: linear-gradient(90deg, #128C7E, #075E54);">
+                        <i class="fab fa-whatsapp"></i> Ahmad
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- WORKSPACE CONTENT -->
+        <div class="workspace">
+
+            <!-- VIEW 1: HOME -->
+            <div id="view-home" class="view-section canvas-container">
+
+                <!-- ARTBOARD HERO -->
+                <div class="artboard">
+                    <div style="position: absolute; top: 10px; right: 10px; display: flex; gap: 5px;">
+                        <span style="background: rgba(0,0,0,0.1); padding: 2px 5px; border-radius: 3px; font-size: 10px;">100%</span>
+                    </div>
+
+                    <!-- Draggable Text -->
+                    <div class="draggable-wrapper" id="heroTextWrapper" title="Geser untuk mengatur posisi">
+                        <div class="element-tag">Judul Utama</div>
+                        <div class="resize-handle rh-tl"></div>
+                        <div class="resize-handle rh-tr"></div>
+                        <div class="resize-handle rh-bl"></div>
+                        <div class="resize-handle rh-br"></div>
+
+                        <h1 class="hero-title">Kurban Berkualitas<br>Ibadah Lebih Khusyuk</h1>
+                    </div>
+
+                    <p class="hero-desc">
+                        Pusatnya sapi kurban sehat, gemuk, dan terawat dengan baik. 
+                        Kandang Lembu Kembar siap memenuhi kebutuhan qurban Idul Adha Anda dengan pelayanan terbaik.
+                    </p>
+
+                    <div style="display: flex; gap: 1rem; justify-content: center;">
+                        <button class="btn-canva btn-primary" onclick="document.getElementById('services').scrollIntoView({behavior: 'smooth'})">
+                            Pilih Sapi Sekarang
+                        </button>
+                        <button class="btn-canva btn-ghost" style="border: 1px solid var(--text-light);">
+                            Lihat Video
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KATALOG SAPI (CONTAINER KOSONG) -->
+                <div id="services">
+                    <div class="section-header">
+                        <h2 class="section-title">Katalog 100 Ekor Sapi <span class="badge-pro">TERSEDIA</span></h2>
+                        <a href="#" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; font-weight: 600;">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+                    </div>
+
+                    <!-- UPDATE: Container Kosong yang akan diisi oleh JS -->
+                    <div id="dynamicCowList" class="template-scroller">
+                        <!-- Javascript akan mengisi 100 kartu di sini -->
+                    </div>
+                </div>
+
+                <!-- DASHBOARD / PANEL ROW -->
+                <div class="panel-row">
+                    <!-- Left: Kondisi Kandang / Galeri -->
+                    <div class="content-panel">
+                        <div class="section-header">
+                            <h2 class="section-title">Galeri Kandang</h2>
+                        </div>
+
+                        <!-- VIDEO PLAYER -->
+                        <div style="width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid var(--text-light); margin-bottom: 2rem;">
+                            <div style="background: rgba(0,0,0,0.05); padding: 0.5rem 1rem; border-bottom: 1px solid var(--text-light); display: flex; justify-content: space-between; align-items: center;">
+                                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark);">Video Kandang</span>
+                                <button style="border: none; background: none; color: var(--text-light); cursor: pointer;"><i class="fas fa-expand"></i></button>
+                            </div>
+                            <video width="100%" height="250px" controls style="background: #000; outline: none; border-radius: 0 0 8px 8px;">
+                                <source src="video pemasaran.mp4" type="video/mp4">
+                                Browser Anda tidak mendukung tag video.
+                            </video>
+                        </div>
+
+                        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-dark);">Dokumentasi Pengiriman</h3>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
+                            <div style="aspect-ratio: 1; background: #eee; border-radius: 8px; overflow: hidden; position: relative;">
+                                <img src="https://picsum.photos/seed/dok1/150/150" alt="Dok" style="width: 100%; height: 100%; object-fit: cover;">
+                                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; font-size: 0.7rem; padding: 4px;">Area Jakarta</div>
+                            </div>
+                            <div style="aspect-ratio: 1; background: #eee; border-radius: 8px; overflow: hidden; position: relative;">
+                                <img src="https://picsum.photos/seed/dok2/150/150" alt="Dok" style="width: 100%; height: 100%; object-fit: cover;">
+                                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; font-size: 0.7rem; padding: 4px;">Area Bandung</div>
+                            </div>
+                            <div style="aspect-ratio: 1; background: #eee; border-radius: 8px; overflow: hidden; position: relative;">
+                                <img src="https://picsum.photos/seed/dok3/150/150" alt="Dok" style="width: 100%; height: 100%; object-fit: cover;">
+                                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; font-size: 0.7rem; padding: 4px;">Area Surabaya</div>
+                            </div>
+                            <div style="aspect-ratio: 1; background: #eee; border-radius: 8px; overflow: hidden; position: relative;">
+                                <img src="https://picsum.photos/seed/dok4/150/150" alt="Dok" style="width: 100%; height: 100%; object-fit: cover;">
+                                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; font-size: 0.7rem; padding: 4px;">Checkup Rutin</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Spesifikasi & Jaminan (Properties) -->
+                    <div class="properties-sidebar">
+                        <div class="property-title">Spesifikasi Hewan</div>
+
+                        <div style="display: flex; flex-direction: column; gap: 1rem;">
+                            <!-- Kriteria 1: KESEHATAN (GREEN) -->
+                            <div style="border: 1px solid var(--primary); border-radius: 6px; padding: 1rem; position: relative;">
+                                <div style="position: absolute; top: -8px; left: 10px; background: var(--primary); color: white; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px;">KESEHATAN</div>
+                                <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 5px;">Lolos Checkup Dokter</div>
+                                <p style="font-size: 0.75rem; color: var(--text-light);">Diperiksa rutin setiap minggu oleh vet ternak bersertifikat.</p>
+                            </div>
+
+                            <!-- Kriteria 2: USIA (BLUE) -->
+                            <div style="border: 1px solid #3b82f6; border-radius: 6px; padding: 1rem; position: relative;">
+                                <div style="position: absolute; top: -8px; left: 10px; background: #3b82f6; color: white; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px;">USIA</div>
+                                <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark); margin-bottom: 5px;">Minimal 2 Tahun</div>
+                                <p style="font-size: 0.75rem; color: var(--text-light);">Memenuhi syarat sah kurban (Musinnah).</p>
+                            </div>
+
+                            <!-- Kriteria 3 -->
+                            <div style="border: 2px solid var(--secondary); border-radius: 6px; padding: 1rem; background: rgba(217, 119, 6, 0.05); position: relative;">
+                                <div style="position: absolute; top: -8px; left: 10px; background: var(--secondary); color: white; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px;">GARANSI</div>
+                                <div style="font-size: 0.85rem; font-weight: 700; color: #b45309; margin-bottom: 5px;">Tukar jika Sakit</div>
+                                <p style="font-size: 0.75rem; color: var(--text-dark);">Garansi penukaran hewan jika ditemukan cacat tersembunyi sebelum hari H.</p>
+                            </div>
+                        </div>
+
+                        <!-- Quick Contact Form -->
+                        <div class="property-title" style="margin-top: 2rem;">Tanya Jawab</div>
+                        
+                        <!-- INTEGRATION: Action and Method added -->
+                        <form 
+                          id="quickContact"
+                          action="https://formspree.io/f/mykzgzez"
+                          method="POST"
+                        >
+                          <input type="hidden" name="_subject" value="Pertanyaan Baru dari Website">
+                          
+                          <div class="form-group-canva">
+                            <label>Nama Anda:</label>
+                            <!-- INTEGRATION: name="nama" (Custom) -->
+                            <input type="text" class="input-canva" placeholder="Nama..." required name="nama">
+                          </div>
+
+                          <!-- NEW FIELD: Email (from snippet) -->
+                          <div class="form-group-canva">
+                            <label>Email Address:</label>
+                            <!-- INTEGRATION: name="email" (Required by snippet) -->
+                            <input type="email" class="input-canva" placeholder="nama@email.com" required name="email">
+                          </div>
+
+                          <div class="form-group-canva">
+                            <label>Pesan:</label>
+                            <!-- INTEGRATION: name="message" (Mapped to snippet's message) -->
+                            <textarea class="input-canva" rows="3" placeholder="Apakah sapi bisa titip sembelih?..." required name="message"></textarea>
+                          </div>
+
+                          <button type="submit" class="btn-canva btn-primary" style="width: 100%; justify-content: center; padding: 0.4rem;">
+                              <i class="fas fa-paper-plane"></i> Kirim Pesan
+                          </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- TESTIMONIALS -->
+                <div>
+                    <div class="property-title">Kata Sahabat Pequrban</div>
+                    <div class="color-grid">
+                        <div class="testimonial-swatch" style="flex: 1; min-width: 250px;">
+                            <div class="swatch-header">
+                                <div class="swatch-avatar">AK</div>
+                                <div>
+                                    <div style="font-weight: 700; font-size: 0.9rem; color: var(--text-dark);">AHMAD K.</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Jakarta Selatan</div>
+                                </div>
+                            </div>
+                            <p style="font-style: italic; font-size: 0.85rem; color: var(--text-dark);">"Sapi Limosinnya mantap, daging tebal. Pengiriman tepat waktu ke masjid."</p>
+                        </div>
+
+                        <div class="testimonial-swatch" style="flex: 1; min-width: 250px;">
+                            <div class="swatch-header">
+                                <div class="swatch-avatar" style="background: linear-gradient(135deg, #d97706, #fbbf24);">BR</div>
+                                <div>
+                                    <div style="font-weight: 700; font-size: 0.9rem; color: var(--text-dark);">BUDI R.</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Bekasi</div>
+                                </div>
+                            </div>
+                            <p style="font-style: italic; font-size: 0.85rem; color: var(--text-dark);">"Pelayanan ramah, hewan sehat. InsyaAllah tahun depan balik lagi ke sini."</p>
+                        </div>
+
+                        <div class="testimonial-swatch" style="flex: 1; min-width: 250px;">
+                            <div class="swatch-header">
+                                <div class="swatch-avatar" style="background: linear-gradient(135deg, #10b981, #3b82f6);">US</div>
+                                <div>
+                                    <div style="font-weight: 700; font-size: 0.9rem; color: var(--text-dark);">USTADZ S.</div>
+                                    <div style="font-size: 0.75rem; color: var(--text-light);">Masjid Al-Ikhlas</div>
+                                </div>
+                            </div>
+                            <p style="font-style: italic; font-size: 0.85rem; color: var(--text-dark);">"Sangat terbantu dengan sistem bagi daging yang rapi dari Kandang Lembu Kembar."</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FOOTER (GLOBAL) -->
+                <footer class="site-footer">
+                    <div class="footer-grid">
+                        <div class="footer-col">
+                            <h4>Kandang Lembu Kembar</h4>
+                            <p>Mitra terpercaya untuk kebutuhan hewan kurban berkualitas tinggi. Sehat, gemuk, dan sesuai syariat.</p>
+                            <div class="social-links">
+                                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                                <a href="#"><i class="fab fa-instagram"></i></a>
+                                <a href="#"><i class="fab fa-tiktok"></i></a>
+                            </div>
+                        </div>
+                        <div class="footer-col">
+                            <h4>Navigasi Cepat</h4>
+                            <a href="#" onclick="goHome()">Beranda</a>
+                            <a href="#" onclick="document.getElementById('services').scrollIntoView({behavior: 'smooth'})">Katalog Sapi</a>
+                            <a href="#" onclick="document.querySelector('.content-panel').scrollIntoView({behavior: 'smooth'})">Galeri</a>
+                            <a href="#" onclick="document.querySelector('.properties-sidebar').scrollIntoView({behavior: 'smooth'})">Tanya Jawab</a>
+                        </div>
+                        <div class="footer-col">
+                            <h4>Hubungi Kami</h4>
+                            <p><i class="fas fa-map-marker-alt" style="width:20px;"></i> Jl. Peternakan No. 12, Bogor, Jawa Barat</p>
+                            <p><i class="fas fa-phone" style="width:20px;"></i> +62 812 3456 7890</p>
+                            <p><i class="fas fa-envelope" style="width:20px;"></i> info@kandlembu.id</p>
+                        </div>
+                    </div>
+                    <div class="copyright">
+                        &copy; 2024 Kandang Lembu Kembar. All Rights Reserved.
+                    </div>
+                </footer>
+
+            </div> <!-- END VIEW 1: HOME -->
+
+
+            <!-- VIEW 2: CHECKOUT (FORMSPREE INTEGRATED) -->
+            <div id="view-checkout" class="view-section hidden">
+                <div class="checkout-container">
+                    <!-- LEFT: FORM -->
+                    <div class="checkout-form">
+                        <div class="section-title"><i class="fas fa-user-edit"></i> Data Pemesan</div>
+                        
+                        <!-- INTEGRATION: Action and Method added -->
+                        <form 
+                          id="paymentForm"
+                          action="https://formspree.io/f/xdaknkor"
+                          method="POST"
+                        >
+                            <!-- Hidden Inputs for Order Context -->
+                            <input type="hidden" name="_subject" value="Pesanan Baru Sapi Kurban">
+                            <input type="hidden" id="formDataProduct" name="produk">
+                            <input type="hidden" id="formDataPrice" name="total_harga">
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Nama Lengkap</label>
+                                <!-- INTEGRATION: name="nama" -->
+                                <input type="text" class="input-canva" placeholder="H. Abdullah" required id="custName" name="nama">
+                            </div>
+                            
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Email Address</label>
+                                <!-- INTEGRATION: name="email" -->
+                                <input type="email" class="input-canva" placeholder="nama@email.com" required name="email">
+                            </div>
+
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Nomor WhatsApp</label>
+                                <!-- INTEGRATION: name="whatsapp" -->
+                                <input type="tel" class="input-canva" placeholder="0812-3456-7890" required id="custPhone" name="whatsapp">
+                            </div>
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Alamat Pengiriman / Kandang</label>
+                                <!-- INTEGRATION: name="message" (Mapped to Address) -->
+                                <textarea class="input-canva" rows="4" placeholder="Alamat lengkap..." required id="custAddress" name="message"></textarea>
+                            </div>
+
+                            <!-- NEW SECTION: PESAN TAMBAHAN -->
+                            <div style="margin-bottom: 1rem;">
+                                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Pesan Tambahan (Opsional)</label>
+                                <textarea class="input-canva" rows="2" placeholder="Contoh: Mohon dititipkan sembelih..." name="catatan"></textarea>
+                            </div>
+
+                        </form>
+                    </div>
+
+                    <!-- RIGHT: SUMMARY -->
+                    <div class="checkout-summary">
+                        <div>
+                            <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light);">Ringkasan Pesanan</h3>
+                            <div class="summary-row"><span style="color: var(--text-dark);">Jenis Sapi</span><span id="summaryPlan" style="color: var(--text-dark); font-weight:600;">-</span></div>
+                            <div class="summary-row"><span style="color: var(--text-dark);">DP (30%)</span><span style="color: var(--text-dark);">Termasuk</span></div>
+                            <div class="summary-row"><span style="color: var(--text-dark);">Biaya Perawatan</span><span style="color: var(--text-dark);">Gratis</span></div>
+                            <div class="total-row"><span style="color: var(--text-dark);">Total Bayar</span><span id="summaryTotal" style="color: var(--text-dark);">Rp 0</span></div>
+                        </div>
+                        <div>
+                            <button type="button" class="btn-pay" onclick="processPayment()">Proses Pesanan <i class="fas fa-arrow-right"></i></button>
+                            <button type="button" class="btn-canva btn-ghost" style="width: 100%; justify-content: center; margin-top: 0.5rem;" onclick="goHome()">Batal</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- FOOTER (DUPLICATE IN CHECKOUT VIEW) -->
+                <footer class="site-footer">
+                    <div class="footer-grid">
+                        <div class="footer-col">
+                            <h4>Kandang Lembu Kembar</h4>
+                            <p>Mitra terpercaya untuk kebutuhan hewan kurban berkualitas tinggi.</p>
+                        </div>
+                        <div class="footer-col">
+                            <h4>Navigasi Cepat</h4>
+                            <a href="#" onclick="goHome()">Beranda</a>
+                        </div>
+                        <div class="footer-col">
+                            <h4>Hubungi Kami</h4>
+                            <p><i class="fas fa-phone" style="width:20px;"></i> +62 812 3456 7890</p>
+                        </div>
+                    </div>
+                    <div class="copyright">
+                        &copy; 2024 Kandang Lembu Kembar.
+                    </div>
+                </footer>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FLOATING WHATSAPP GROUP -->
+    <div class="floating-wa-group">
+        <!-- WA Ahmad (Atas) -->
+        <a href="https://wa.me/6289687552388?text=Halo,%20saya%20ingin%20bertanya%20dengan%20Ahmad%20Jumyana." 
+           target="_blank" 
+           class="floating-wa" 
+           title="Hubungi Ahmad">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+        
+        <!-- WA Mahmud (Bawah) -->
+        <a href="https://wa.me/6285893107859?text=Halo,%20saya%20ingin%20bertanya%20dengan%20Mahmud%20Arifin." 
+           target="_blank" 
+           class="floating-wa" 
+           title="Hubungi Mahmud">
+            <i class="fab fa-whatsapp"></i>
+        </a>
+    </div>
+
+    <!-- SUCCESS MODAL -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-card">
+            <div class="success-icon"><i class="fas fa-check"></i></div>
+            <h2>Pesanan Berhasil!</h2>
+            <p style="color: #666; margin: 1rem 0;">Terima kasih telah mempercayakan kurban Anda kepada Kandang Lembu Kembar. Admin kami akan segera menghubungi via WhatsApp.</p>
+            <button class="btn-canva btn-primary" style="width: 100%; justify-content: center;" onclick="dismissModal()">Kembali ke Beranda</button>
+        </div>
+    </div>
+
+    <!-- DETAIL MODAL -->
+    <div class="modal-overlay" id="detailModal">
+        <div class="detail-modal-card">
+            <div class="detail-header">
+                <h3 class="detail-title">Detail Sapi</h3>
+                <button class="detail-close" onclick="closeDetail()"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <img src="" id="detailImgDisplay" class="detail-image" alt="Sapi">
+            
+            <div class="detail-spec-grid">
+                <div class="spec-label">Type</div>
+                <div class="spec-value" id="detailTypeDisplay">-</div>
+                
+                <div class="spec-label">Bobot</div>
+                <div class="spec-value" id="detailWeightDisplay">-</div>
+                
+                <div class="spec-label">Harga</div>
+                <div class="spec-value" id="detailPriceDisplay" style="color: var(--primary-dark);">-</div>
+            </div>
+
+            <button class="btn-canva btn-primary" style="width: 100%; justify-content: center; margin-top: 1rem;" onclick="closeDetail()">Tutup</button>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // --- THEME TOGGLE ---
+        function toggleTheme() {
+            const body = document.body;
+            const themeIcon = document.getElementById('themeIcon');
+            const currentTheme = body.getAttribute('data-theme');
+            
+            if (currentTheme === 'dark') {
+                body.setAttribute('data-theme', 'light');
+                themeIcon.classList.remove('fa-sun');
+                themeIcon.classList.add('fa-moon');
+            } else {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.classList.remove('fa-moon');
+                themeIcon.classList.add('fa-sun');
+            }
+        }
+
+        // --- GENERATE 100 KARTU API (SCRIPT BARU) ---
+        function generateCows() {
+            const container = document.getElementById('dynamicCowList');
+            const cowTypes = ['Simental', 'Limosin', 'Bali', 'PO', 'Angus', 'Madura', 'Brahman'];
+            
+            for (let i = 1; i <= 100; i++) {
+                // Random data untuk variasi
+                const type = cowTypes[Math.floor(Math.random() * cowTypes.length)];
+                const basePrice = 14000000;
+                const weight = 300 + Math.floor(Math.random() * 300); // 300-600kg
+                const price = basePrice + (weight * 25000); // Harga berdasarkan bobot
+                
+                // Format angka
+                const priceFormatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
+                
+                // Create Element HTML untuk Kartu
+                const card = document.createElement('div');
+                card.className = 'template-card';
+                
+                // Struktur HTML sama seperti kartu statis sebelumnya
+                card.innerHTML = `
+                    <div class="template-preview">
+                        <img src="https://picsum.photos/seed/cow${i}/400/300" alt="${type}">
+                    </div>
+                    <div class="template-info">
+                        <h3>Sapi ${type} #${i.toString().padStart(3, '0')}</h3>
+                        <p>Type: ${type} | Bobot: ~${weight} Kg</p>
+                        <div class="template-action">
+                            <span class="price-tag">${priceFormatted}</span>
+                            <div style="display: flex; gap: 5px; align-items: center;">
+                                <button class="btn-canva btn-ghost btn-detail" 
+                                            onclick="openDetail(this)" 
+                                            data-type="${type}" 
+                                            data-weight="${weight} Kg" 
+                                            data-price="${priceFormatted}"
+                                            data-img="https://picsum.photos/seed/cow${i}/400/300"
+                                            title="Lihat Detail">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                                <button class="btn-canva btn-ghost" style="padding: 4px 8px; font-size: 0.8rem;" 
+                                            onclick="openCheckout('Sapi ${type} #${i.toString().padStart(3, '0')}', ${price})">Beli</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            }
+        }
+
+        // --- NAVIGATION ---
+        function goHome() {
+            document.getElementById('view-checkout').classList.add('hidden');
+            document.getElementById('view-home').classList.remove('hidden');
+            document.getElementById('pageTitle').innerText = "Kandang Lembu Kembar";
+            document.querySelector('.workspace').scrollTop = 0;
+        }
+
+        function dismissModal() {
+            document.getElementById('successModal').classList.remove('show');
+            goHome();
+        }
+
+        function switchTab(element, tabName) {
+            // Ensure we are on home view if clicking nav
+            document.getElementById('view-checkout').classList.add('hidden');
+            document.getElementById('view-home').classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            
+            if(tabName === 'home') {
+                document.querySelector('.workspace').scrollTo({top: 0, behavior: 'smooth'});
+            } else if (tabName === 'templates') {
+                document.getElementById('services').scrollIntoView({behavior: 'smooth'});
+            } else if (tabName === 'recent') {
+                const contentPanel = document.querySelector('.content-panel');
+                if(contentPanel) contentPanel.scrollIntoView({behavior: 'smooth'});
+            }
+        }
+
+        // --- DETAIL LOGIC ---
+        function openDetail(btnElement) {
+            // Get data from button's data- attributes
+            const type = btnElement.getAttribute('data-type');
+            const weight = btnElement.getAttribute('data-weight');
+            const price = btnElement.getAttribute('data-price');
+            const imgSrc = btnElement.getAttribute('data-img');
+
+            // Fill Modal
+            document.getElementById('detailTypeDisplay').innerText = type;
+            document.getElementById('detailWeightDisplay').innerText = weight;
+            document.getElementById('detailPriceDisplay').innerText = price;
+            document.getElementById('detailImgDisplay').src = imgSrc;
+
+            // Show Modal
+            document.getElementById('detailModal').classList.add('show');
+        }
+
+        function closeDetail() {
+            document.getElementById('detailModal').classList.remove('show');
+        }
+
+        // --- CHECKOUT LOGIC (Updated with Formspree Integration) ---
+        function openCheckout(cowName, price) {
+            document.getElementById('summaryPlan').innerText = cowName;
+            document.getElementById('summaryTotal').innerText = formatRupiah(price);
+            
+            // Pre-fill hidden inputs so they are ready for submission
+            document.getElementById('formDataProduct').value = cowName;
+            document.getElementById('formDataPrice').value = formatRupiah(price);
+            
+            document.getElementById('view-home').classList.add('hidden');
+            document.getElementById('view-checkout').classList.remove('hidden');
+            document.getElementById('pageTitle').innerText = "Checkout Pesanan";
+            document.querySelector('.workspace').scrollTop = 0;
+        }
+
+        async function processPayment() {
+            const form = document.getElementById("paymentForm");
+            const data = new FormData(form);
+
+            // Validation form only (Name, Phone, Address, Email)
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            // Simulasi Loading UI (Old Function)
+            const btn = document.querySelector('.btn-pay');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Mengirim...';
+            btn.disabled = true;
+
+            // INTEGRATION: Fetch Request to Formspree
+            try {
+                const response = await fetch(form.action, {
+                    method: form.method,
+                    body: data,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // Success: Show Modal (Old Function)
+                    document.getElementById('successModal').classList.add('show');
+                    form.reset();
+                } else {
+                    const errorData = await response.json();
+                    if (Object.hasOwn(errorData, 'errors')) {
+                        showToast(errorData["errors"].map(error => error["message"]).join(", "));
+                    } else {
+                        showToast("Oops! Terjadi kesalahan saat mengirim pesanan.");
+                    }
+                }
+            } catch (error) {
+                showToast("Oops! Terjadi kesalahan jaringan.");
+            } finally {
+                // Reset Button State (Old Function)
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        // --- DRAG INTERACTION (Simulasi Canva) ---
+        const dragWrapper = document.getElementById('heroTextWrapper');
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+
+        dragWrapper.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+            startY = e.clientY;
+            
+            const rect = dragWrapper.getBoundingClientRect();
+            const parentRect = dragWrapper.parentElement.getBoundingClientRect();
+            
+            initialLeft = rect.left - parentRect.left;
+            initialTop = rect.top - parentRect.top;
+
+            dragWrapper.style.cursor = 'grabbing';
+            dragWrapper.style.position = 'absolute';
+            dragWrapper.style.left = initialLeft + 'px';
+            dragWrapper.style.top = initialTop + 'px';
+            dragWrapper.style.width = rect.width + 'px';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault();
+            
+            const dx = e.clientX - startX;
+            const dy = e.clientY - startY;
+            
+            dragWrapper.style.left = `${initialLeft + dx}px`;
+            dragWrapper.style.top = `${initialTop + dy}px`;
+        });
+
+        document.addEventListener('mouseup', () => {
+            if(isDragging) {
+                isDragging = false;
+                dragWrapper.style.cursor = 'move';
+            }
+        });
+
+        // --- QUICK CONTACT HANDLING (Updated with Formspree) ---
+        const quickContactForm = document.getElementById("quickContact");
+        
+        async function handleContactSubmit(event) {
+          event.preventDefault();
+          const form = event.target;
+          const data = new FormData(form);
+          const btn = form.querySelector('button');
+
+          // Button Loading State
+          const originalText = btn.innerHTML;
+          btn.innerHTML = 'Mengirim...';
+          btn.disabled = true;
+
+          try {
+            const response = await fetch(form.action, {
+                method: form.method,
+                body: data,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                showToast("Pesan terkirim! Admin akan membalas segera.");
+                form.reset();
+            } else {
+                showToast("Oops! Terjadi kesalahan saat mengirim pesan.");
+            }
+          } catch (error) {
+            showToast("Oops! Terjadi kesalahan jaringan.");
+          } finally {
+              // Restore Button
+              btn.innerHTML = originalText;
+              btn.disabled = false;
+          }
+        }
+
+        quickContactForm.addEventListener("submit", handleContactSubmit);
+
+        // --- TOAST SYSTEM ---
+        function showToast(message) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `<i class="fas fa-check-circle" style="color: var(--primary);"></i> ${message}`;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // --- ANIMATION OBSERVER ---
+        const observerOptions = { threshold: 0.1 };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Init Generate 100 Cows
+        generateCows();
+        
+        // Attach Observer to generated elements
+        document.querySelectorAll('.template-card').forEach((el, index) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = `all 0.5s ease ${index * 0.05}s`; // Stagger animation
+            observer.observe(el);
+        });
+
+        // --- UTILITY ---
+        function formatRupiah(number) {
+            return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(number);
+        }
+    </script>
+</body>
+</html>
