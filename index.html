@@ -344,6 +344,7 @@
             color: var(--text-dark);
         }
 
+        /* Mode 1: Horizontal Scroller (Default) */
         .template-scroller {
             display: flex;
             gap: 1.5rem;
@@ -351,6 +352,16 @@
             padding-bottom: 1rem;
             scrollbar-width: thin;
             scrollbar-color: var(--text-light) transparent;
+            transition: all 0.5s ease;
+        }
+
+        /* Mode 2: Grid View (All Items) */
+        .grid-view {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            width: 100%;
+            transition: all 0.5s ease;
         }
 
         .template-card {
@@ -363,6 +374,9 @@
             position: relative;
             border: 1px solid transparent;
             transition: background-color 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .template-card:hover {
@@ -381,6 +395,7 @@
             font-size: 3rem;
             position: relative;
             overflow: hidden;
+            width: 100%;
         }
 
         .template-preview img {
@@ -396,6 +411,9 @@
 
         .template-info {
             padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
         }
 
         .template-info h3 {
@@ -416,6 +434,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-top: auto;
         }
 
         .price-tag {
@@ -619,7 +638,7 @@
             margin-bottom: 1rem;
         }
 
-        /* --- MODAL SUCCESS --- */
+        /* --- MODAL SUCCESS (CHECKOUT) --- */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
@@ -644,7 +663,6 @@
             padding: 3rem 2rem 2rem;
             margin-top: 4rem;
             border-top: 1px solid rgba(255,255,255,0.1);
-            /* Ensure footer is separate from views but inside workspace for scroll */
             flex-shrink: 0; 
         }
 
@@ -728,7 +746,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
+            font-size: 24px; 
             box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
             transition: transform 0.3s, box-shadow 0.3s;
             text-decoration: none;
@@ -868,7 +886,6 @@
                 <i class="fas fa-chevron-left" style="color: var(--text-light); cursor: pointer;" onclick="goHome()"></i>
                 <div class="project-title">
                     <span id="pageTitle">Kandang Lembu Kembar</span>
-                    <i class="fas fa-pen" style="font-size: 0.8rem; color: var(--text-light); margin-left: 8px;"></i>
                 </div>
             </div>
 
@@ -879,13 +896,13 @@
 
                 <!-- UPDATE: 2 Tombol WhatsApp di Top Bar -->
                 <div style="display: flex; gap: 0.5rem;">
-                    <a href="https://wa.me/6285893107859?text=Halo%20Mahmud,%20saya%20tertarik%20membeli%20sapi%20kurban." 
+                    <a href="https://wa.me/6285893107859?text=Halo%20Pak%20Mahmud,%20saya%20tertarik%20membeli%20sapi%20kurban." 
                        target="_blank" 
                        class="btn-canva btn-primary"
                        style="flex: 1; justify-content: center; font-size: 0.75rem; padding: 0.5rem 0.5rem;">
                         <i class="fab fa-whatsapp"></i> Mahmud
                     </a>
-                    <a href="https://wa.me/6289687552388?text=Halo%20Ahmad,%20saya%20tertarik%20membeli%20sapi%20kurban." 
+                    <a href="https://wa.me/6289687552388?text=Halo%20Pak%20Ahmad,%20saya%20tertarik%20membeli%20sapi%20kurban." 
                        target="_blank" 
                        class="btn-canva btn-primary"
                        style="flex: 1; justify-content: center; font-size: 0.75rem; padding: 0.5rem 0.5rem; background: linear-gradient(90deg, #128C7E, #075E54);">
@@ -927,17 +944,22 @@
                         <button class="btn-canva btn-primary" onclick="document.getElementById('services').scrollIntoView({behavior: 'smooth'})">
                             Pilih Sapi Sekarang
                         </button>
-                        <button class="btn-canva btn-ghost" style="border: 1px solid var(--text-light);">
+                        <!-- PERUBAHAN DISINI: Menambahkan onclick untuk scroll ke galeri -->
+                        <button class="btn-canva btn-ghost" style="border: 1px solid var(--text-light);" onclick="document.getElementById('galeri-kandang').scrollIntoView({behavior: 'smooth'})">
                             Lihat Video
                         </button>
                     </div>
                 </div>
 
-                <!-- KATALOG SAPI (CONTAINER KOSONG) -->
+                <!-- KATALOG SAPI -->
                 <div id="services">
                     <div class="section-header">
                         <h2 class="section-title">Katalog Sapi <span class="badge-pro">TERSEDIA</span></h2>
-                        <a href="#" style="color: var(--primary); text-decoration: none; font-size: 0.9rem; font-weight: 600;">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+                        
+                        <!-- UPDATE: Tombol View All (Switch Mode) -->
+                        <button class="btn-canva btn-primary" onclick="toggleViewAll(this)" id="btnViewToggle">
+                            Lihat Semua <i class="fas fa-th-large"></i>
+                        </button>
                     </div>
 
                     <!-- UPDATE: Container Kosong yang akan diisi oleh JS -->
@@ -949,7 +971,8 @@
                 <!-- DASHBOARD / PANEL ROW -->
                 <div class="panel-row">
                     <!-- Left: Kondisi Kandang / Galeri -->
-                    <div class="content-panel">
+                    <!-- PERUBAHAN DISINI: Menambahkan id="galeri-kandang" -->
+                    <div class="content-panel" id="galeri-kandang">
                         <div class="section-header">
                             <h2 class="section-title">Galeri Kandang</h2>
                         </div>
@@ -957,7 +980,7 @@
                         <!-- VIDEO PLAYER -->
                         <div style="width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid var(--text-light); margin-bottom: 2rem;">
                             <div style="background: rgba(0,0,0,0.05); padding: 0.5rem 1rem; border-bottom: 1px solid var(--text-light); display: flex; justify-content: space-between; align-items: center;">
-                                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark);">Video Kandang</span>
+                                <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark);"><i class="fas fa-video" style="color: #000000; margin-right: 5px;"></i> Video Kandang</span>
                                 <button style="border: none; background: none; color: var(--text-light); cursor: pointer;"><i class="fas fa-expand"></i></button>
                             </div>
                             <video width="100%" height="250px" controls style="background: #000; outline: none; border-radius: 0 0 8px 8px;">
@@ -1106,18 +1129,19 @@
                             <h4>Navigasi Cepat</h4>
                             <a href="#" onclick="goHome()">Beranda</a>
                             <a href="#" onclick="document.getElementById('services').scrollIntoView({behavior: 'smooth'})">Katalog Sapi</a>
-                            <a href="#" onclick="document.querySelector('.content-panel').scrollIntoView({behavior: 'smooth'})">Galeri</a>
+                            <a href="#" onclick="document.getElementById('galeri-kandang').scrollIntoView({behavior: 'smooth'})">Galeri</a>
                             <a href="#" onclick="document.querySelector('.properties-sidebar').scrollIntoView({behavior: 'smooth'})">Tanya Jawab</a>
                         </div>
                         <div class="footer-col">
                             <h4>Hubungi Kami</h4>
-                            <p><i class="fas fa-map-marker-alt" style="width:20px;"></i> Jl. Peternakan No. 12, Bogor, Jawa Barat</p>
-                            <p><i class="fas fa-phone" style="width:20px;"></i> +62 812 3456 7890</p>
-                            <p><i class="fas fa-envelope" style="width:20px;"></i> info@kandlembu.id</p>
+                            <p><i class="fas fa-map-marker-alt" style="width:20px;"></i> Jl. Raya Kp. Setu Rawa Banteng Ds. Mekarwangi, Kec. Cikarang Barat Bekasi</p>
+                            <p><i class="fas fa-phone" style="width:20px;"></i> +62 858 9310 7859 Mahmud Arifin</p>
+                            <p><i class="fas fa-phone" style="width:20px;"></i> +62 896 8755 2388 Ahmad Jumyana</p>
+                            <p><i class="fas fa-envelope" style="width:20px;"></i> Kandanglembukembar448@gmail.com</p>
                         </div>
                     </div>
                     <div class="copyright">
-                        &copy; 2024 Kandang Lembu Kembar. All Rights Reserved.
+                        &copy; 2026 Kandang Lembu Kembar. All Rights Reserved.
                     </div>
                 </footer>
 
@@ -1160,7 +1184,7 @@
                                 <input type="tel" class="input-canva" placeholder="0812-3456-7890" required id="custPhone" name="whatsapp">
                             </div>
                             <div style="margin-bottom: 1rem;">
-                                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Alamat Pengiriman / Kandang</label>
+                                <label style="display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem;">Alamat Pengiriman</label>
                                 <!-- INTEGRATION: name="message" (Mapped to Address) -->
                                 <textarea class="input-canva" rows="4" placeholder="Alamat lengkap..." required id="custAddress" name="message"></textarea>
                             </div>
@@ -1176,6 +1200,49 @@
 
                     <!-- RIGHT: SUMMARY -->
                     <div class="checkout-summary">
+                        
+                        <!-- PEMBARUAN: BAGIAN METODE PEMBAYARAN -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <h3 style="font-size: 0.85rem; font-weight: 700; margin-bottom: 0.8rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light);">Metode Pembayaran</h3>
+                            
+                            <!-- Visualisasi Bank & E-Wallet (Ikon) -->
+                            <div style="display: flex; gap: 0.8rem; margin-bottom: 1rem; color: var(--text-light); flex-wrap: wrap;">
+                                <i class="fab fa-cc-visa fa-lg" title="Visa"></i>
+                                <i class="fab fa-cc-mastercard fa-lg" title="Mastercard"></i>
+                                <i class="fas fa-university fa-lg" title="Transfer Bank"></i>
+                                <i class="fas fa-wallet fa-lg" title="E-Wallet"></i>
+                                <span style="font-size: 0.8rem; align-self: center;">& Banyak Lainnya</span>
+                            </div>
+
+                            <!-- Kartu Rekening Utama -->
+                            <div style="background: white; border: 1px solid #e5e7eb; border-radius: 8px; padding: 1rem; position: relative; overflow: hidden;">
+                                <!-- Aksen Warna Bank -->
+                                <div style="position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #0056b3;"></div>
+                                
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                    <div style="font-weight: 800; color: #0056b3; font-size: 1.1rem;">BCA</div>
+                                    <i class="fas fa-university" style="color: #0056b3; opacity: 0.5;"></i>
+                                </div>
+                                
+                                <div style="margin-bottom: 0.2rem; color: var(--text-light); font-size: 0.75rem;">Nomor Rekening</div>
+                                <div style="font-family: 'Courier New', monospace; font-size: 1.2rem; font-weight: 700; color: var(--text-dark); letter-spacing: 1px;">
+                                    8760906515
+                                </div>
+                                
+                                <div style="margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px dashed #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <div style="font-size: 0.7rem; color: var(--text-light);">a.n</div>
+                                        <div style="font-weight: 600; color: var(--text-dark); font-size: 0.9rem;">Mahmud Arifin</div>
+                                    </div>
+                                </div>
+                                
+                                <div style="margin-top: 0.8rem; font-size: 0.7rem; color: var(--primary-dark); background: rgba(16, 185, 129, 0.1); padding: 4px 8px; border-radius: 4px; display: inline-block;">
+                                    <i class="fas fa-check-circle"></i> Semua metode transfer (Bank / E-Wallet) mohon diarahkan ke rekening ini.
+                                </div>
+                            </div>
+                        </div>
+                        <!-- AKHIR PEMBARUAN METODE PEMBAYARAN -->
+
                         <div>
                             <h3 style="font-size: 1rem; font-weight: 700; margin-bottom: 1rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-light);">Ringkasan Pesanan</h3>
                             <div class="summary-row"><span style="color: var(--text-dark);">Jenis Sapi</span><span id="summaryPlan" style="color: var(--text-dark); font-weight:600;">-</span></div>
@@ -1218,7 +1285,7 @@
     <!-- FLOATING WHATSAPP GROUP -->
     <div class="floating-wa-group">
         <!-- WA Ahmad (Atas) -->
-        <a href="https://wa.me/6289687552388?text=Halo,%20saya%20ingin%20bertanya%20dengan%20Ahmad%20Jumyana." 
+        <a href="https://wa.me/6289687552388?text=Halo,%20saya%20ingin%20bertanya%20dengan%20Pak%20Ahmad%20Jumyana." 
            target="_blank" 
            class="floating-wa" 
            title="Hubungi Ahmad">
@@ -1226,7 +1293,7 @@
         </a>
         
         <!-- WA Mahmud (Bawah) -->
-        <a href="https://wa.me/6285893107859?text=Halo,%20saya%20ingin%20bertanya%20dengan%20Mahmud%20Arifin." 
+        <a href="https://wa.me/6285893107859?text=Halo,%20saya%20ingin%20bertanya%20dengan%20Pak%20Mahmud%20Arifin." 
            target="_blank" 
            class="floating-wa" 
            title="Hubungi Mahmud">
@@ -1290,17 +1357,29 @@
             }
         }
 
-        // --- GENERATE 100 KARTU API (SCRIPT BARU) ---
+        // --- GENERATE 100 KARTU SAPI (UPDATE KATEGORI) ---
         function generateCows() {
             const container = document.getElementById('dynamicCowList');
-            const cowTypes = ['Simental', 'Limosin', 'Bali', 'PO', 'Angus', 'Madura', 'Brahman'];
+            
+            // Definisi Kategori Baru (Type A, B, C, SUPER 1, SUPER 2)
+            const cowTypes = [
+                { name: 'A', weightMin: 185, weightMax: 205, priceMin: 15000000, priceMax: 16000000 },
+                { name: 'B', weightMin: 206, weightMax: 235, priceMin: 17000000, priceMax: 18000000 },
+                { name: 'C', weightMin: 236, weightMax: 255, priceMin: 19000000, priceMax: 20000000 },
+                { name: 'SUPER', weightMin: 256, weightMax: 305, priceMin: 21000000, priceMax: 23000000, label: 'SUPER' },
+                { name: 'SUPER', weightMin: 326, weightMax: 455, priceMin: 24000000, priceMax: 30000000, label: 'SUPER' }
+            ];
             
             for (let i = 1; i <= 100; i++) {
-                // Random data untuk variasi
-                const type = cowTypes[Math.floor(Math.random() * cowTypes.length)];
-                const basePrice = 14000000;
-                const weight = 300 + Math.floor(Math.random() * 300); // 300-600kg
-                const price = basePrice + (weight * 25000); // Harga berdasarkan bobot
+                // Pilih kategori secara acak
+                const randomTypeIndex = Math.floor(Math.random() * cowTypes.length);
+                const selectedType = cowTypes[randomTypeIndex];
+                
+                // Hitung bobot acak dalam rentang kategori tersebut
+                const weight = Math.floor(Math.random() * (selectedType.weightMax - selectedType.weightMin + 1)) + selectedType.weightMin;
+                
+                // Hitung harga acak dalam rentang harga kategori tersebut
+                const price = Math.floor(Math.random() * (selectedType.priceMax - selectedType.priceMin + 1)) + selectedType.priceMin;
                 
                 // Format angka
                 const priceFormatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
@@ -1309,20 +1388,20 @@
                 const card = document.createElement('div');
                 card.className = 'template-card';
                 
-                // Struktur HTML sama seperti kartu statis sebelumnya
+                // Struktur HTML
                 card.innerHTML = `
                     <div class="template-preview">
-                        <img src="https://picsum.photos/seed/cow${i}/400/300" alt="${type}">
+                        <img src="https://picsum.photos/seed/cow${i}/400/300" alt="${selectedType.name}">
                     </div>
                     <div class="template-info">
-                        <h3>Sapi ${type} #${i.toString().padStart(3, '0')}</h3>
-                        <p>Type: ${type} | Bobot: ~${weight} Kg</p>
+                        <h3>Sapi Type ${selectedType.name} #${i.toString().padStart(3, '0')}</h3>
+                        <p>Bobot: ${weight} Kg</p>
                         <div class="template-action">
                             <span class="price-tag">${priceFormatted}</span>
                             <div style="display: flex; gap: 5px; align-items: center;">
                                 <button class="btn-canva btn-ghost btn-detail" 
                                             onclick="openDetail(this)" 
-                                            data-type="${type}" 
+                                            data-type="${selectedType.name}" 
                                             data-weight="${weight} Kg" 
                                             data-price="${priceFormatted}"
                                             data-img="https://picsum.photos/seed/cow${i}/400/300"
@@ -1330,13 +1409,33 @@
                                     <i class="fas fa-info-circle"></i>
                                 </button>
                                 <button class="btn-canva btn-ghost" style="padding: 4px 8px; font-size: 0.8rem;" 
-                                            onclick="openCheckout('Sapi ${type} #${i.toString().padStart(3, '0')}', ${price})">Beli</button>
+                                            onclick="openCheckout('Sapi Type ${selectedType.name} #${i.toString().padStart(3, '0')}', ${price})">Beli</button>
                             </div>
                         </div>
                     </div>
                 `;
                 
                 container.appendChild(card);
+            }
+        }
+
+        // --- TOGGLE VIEW ALL (FITUR BARU) ---
+        function toggleViewAll(btnElement) {
+            const list = document.getElementById('dynamicCowList');
+            const isGrid = list.classList.contains('grid-view');
+            
+            if (!isGrid) {
+                // Ubah ke Mode Grid (Lihat Semua)
+                list.classList.remove('template-scroller');
+                list.classList.add('grid-view');
+                btnElement.innerHTML = 'Lihat Daftar <i class="fas fa-list"></i>';
+                // Scroll ke section atas agar user melihat perubahan
+                document.getElementById('services').scrollIntoView({behavior: 'smooth'});
+            } else {
+                // Ubah ke Mode List (Scroll Horizontal)
+                list.classList.remove('grid-view');
+                list.classList.add('template-scroller');
+                btnElement.innerHTML = 'Lihat Semua <i class="fas fa-th-large"></i>';
             }
         }
 
@@ -1373,7 +1472,7 @@
 
         // --- DETAIL LOGIC ---
         function openDetail(btnElement) {
-            // Get data from button's data- attributes
+            // Get data from button's data-attributes
             const type = btnElement.getAttribute('data-type');
             const weight = btnElement.getAttribute('data-weight');
             const price = btnElement.getAttribute('data-price');
@@ -1393,7 +1492,7 @@
             document.getElementById('detailModal').classList.remove('show');
         }
 
-        // --- CHECKOUT LOGIC (Updated with Formspree Integration) ---
+        // --- CHECKOUT LOGIC ---
         function openCheckout(cowName, price) {
             document.getElementById('summaryPlan').innerText = cowName;
             document.getElementById('summaryTotal').innerText = formatRupiah(price);
@@ -1455,7 +1554,7 @@
             }
         }
 
-        // --- DRAG INTERACTION (Simulasi Canva) ---
+        // --- DRAG INTERACTION ---
         const dragWrapper = document.getElementById('heroTextWrapper');
         let isDragging = false;
         let startX, startY, initialLeft, initialTop;
@@ -1496,7 +1595,7 @@
             }
         });
 
-        // --- QUICK CONTACT HANDLING (Updated with Formspree) ---
+        // --- QUICK CONTACT HANDLING ---
         const quickContactForm = document.getElementById("quickContact");
         
         async function handleContactSubmit(event) {
@@ -1571,7 +1670,7 @@
         document.querySelectorAll('.template-card').forEach((el, index) => {
             el.style.opacity = '0';
             el.style.transform = 'translateY(20px)';
-            el.style.transition = `all 0.5s ease ${index * 0.05}s`; // Stagger animation
+            el.style.transition = `all 0.5s ease ${index * 0.05}s`;
             observer.observe(el);
         });
 
