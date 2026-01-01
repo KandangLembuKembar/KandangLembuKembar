@@ -458,6 +458,7 @@
             height: 100%;
             object-fit: cover;
             transition: transform 0.5s ease;
+            cursor: zoom-in; /* Indikator visual bahwa bisa diklik */
         }
 
         .template-card:hover .template-preview img {
@@ -685,12 +686,13 @@
             font-weight: 700; color: var(--text-dark); font-size: 1.1rem;
             text-align: right;
         }
-        .detail-image {
+        .detail-image, .detail-video {
             width: 100%;
-            height: 200px;
+            height: 250px; /* Tinggi area media */
             object-fit: cover;
             border-radius: 8px;
             margin-bottom: 1rem;
+            background: #000;
         }
 
         /* --- MODAL SUCCESS (CHECKOUT) --- */
@@ -710,6 +712,60 @@
             border-radius: 50%; display: flex; align-items: center; justify-content: center;
             font-size: 2.5rem; margin: 0 auto 1.5rem;
         }
+
+        /* --- FIX: LIGHTBOX (FULL SCREEN) --- */
+        #lightboxOverlay {
+            display: none; 
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.85); 
+            backdrop-filter: blur(8px); 
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 10002; /* Di atas semua modal */
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+        #lightboxOverlay.show {
+            display: flex;
+            opacity: 1;
+        }
+        #lightboxImage {
+            max-width: 100%;
+            max-height: 90vh; 
+            width: auto;
+            height: auto;
+            object-fit: contain; 
+            border-radius: 4px;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.7);
+            animation: zoomIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.5);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 10003;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .lightbox-close:hover {
+            background: rgba(255,255,255,0.4);
+        }
+        @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
         /* --- GLOBAL FOOTER --- */
         .site-footer {
@@ -982,7 +1038,7 @@
     <!-- UPDATE: LOADING SCREEN -->
     <div id="loading-screen">
         <div class="loader-spinner"></div>
-        <h3 style="color: var(--primary);">Loading...</h3>
+        <h3 style="color: var(--primary);">Memuat Kandang...</h3>
     </div>
 
     <div class="bg-pattern"></div>
@@ -1068,7 +1124,7 @@
 
                     <p class="hero-desc">
                         Pusatnya sapi kurban sehat, gemuk, dan terawat dengan baik. 
-                        Kandang Lembu Kembar siap memenuhi kebutuhan kurban Idul Adha Anda dengan pelayanan terbaik.
+                        Kandang Lembu Kembar siap memenuhi kebutuhan qurban Idul Adha Anda dengan pelayanan terbaik.
                     </p>
 
                     <div style="display: flex; gap: 1rem; justify-content: center;">
@@ -1269,7 +1325,7 @@
 
                 <!-- TESTIMONIALS -->
                 <div>
-                    <div class="property-title">Kata Sahabat Pekurban</div>
+                    <div class="property-title">Kata Sahabat Pequrban</div>
                     <div class="color-grid">
                         <div class="testimonial-swatch" style="flex: 1; min-width: 250px;">
                             <div class="swatch-header">
@@ -1471,13 +1527,19 @@
                         </div>
                     </div>
                     <div class="copyright">
-                        &copy; 2026 Kandang Lembu Kembar.
+                        &copy; 2024 Kandang Lembu Kembar.
                     </div>
                 </footer>
             </div>
 
         </div>
     </main>
+
+    <!-- FIX: LIGHTBOX MODAL (FULL SCREEN) -->
+    <div id="lightboxOverlay" onclick="closeLightbox()">
+        <button class="lightbox-close" onclick="closeLightbox()"><i class="fas fa-times"></i></button>
+        <img id="lightboxImage" src="" alt="Full Screen" onclick="event.stopPropagation()">
+    </div>
 
     <!-- FLOATING WHATSAPP GROUP -->
     <div class="floating-wa-group">
@@ -1513,7 +1575,7 @@
         </div>
     </div>
 
-    <!-- DETAIL MODAL -->
+    <!-- DETAIL MODAL (UPDATED: VIDEO SUPPORT) -->
     <div class="modal-overlay" id="detailModal">
         <div class="detail-modal-card">
             <div class="detail-header">
@@ -1521,7 +1583,15 @@
                 <button class="detail-close" onclick="closeDetail()"><i class="fas fa-times"></i></button>
             </div>
             
-            <img src="" id="detailImgDisplay" class="detail-image" alt="Sapi">
+            <!-- UPDATED: MEDIA CONTAINER (IMAGE OR VIDEO) -->
+            <div style="position: relative; background: #000; border-radius: 8px; overflow: hidden; margin-bottom: 1rem; width: 100%; height: 250px;">
+                <!-- Default hidden until loaded -->
+                <img id="detailImgDisplay" class="detail-image" src="" alt="Sapi" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                <!-- Video Element -->
+                <video id="detailVideoDisplay" class="detail-video" controls loop muted autoplay playsinline style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                    Browser Anda tidak mendukung tag video.
+                </video>
+            </div>
             
             <div class="detail-spec-grid">
                 <div class="spec-label">Type</div>
@@ -1542,113 +1612,112 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
-        // --- UPDATE: DATA STATIS UNTUK 100 SAPI ---
+        // --- UPDATE: DATA STATIS UNTUK 100 SAPI (DITAMBAH VIDEO) ---
         // Silakan edit data di bawah ini sesuai kebutuhan.
-        // image: Ganti URL dengan path gambar lokal Anda (contoh: "images/sapi1.jpg")
-        // type: Tipe sapi (A, B, C, SUPER)
-        // weight: Bobot dalam Kg
-        // price: Harga dalam angka (tanpa titik)
+        // image: Gambar untuk katalog (biasanya landscape).
+        // video: Link video spesifik untuk detail modal (jika dikosongkan, modal akan menampilkan gambar).
+        // type, weight, price: data lainnya.
         const cowData = [
-            { id: 1, type: 'A', weight: 195, price: 15500000, image: 'https://picsum.photos/seed/cow1/400/300' },
-            { id: 2, type: 'A', weight: 200, price: 15800000, image: 'https://picsum.photos/seed/cow2/400/300' },
-            { id: 3, type: 'A', weight: 205, price: 16000000, image: 'https://picsum.photos/seed/cow3/400/300' },
-            { id: 4, type: 'B', weight: 210, price: 17000000, image: 'https://picsum.photos/seed/cow4/400/300' },
-            { id: 5, type: 'B', weight: 220, price: 17500000, image: 'https://picsum.photos/seed/cow5/400/300' },
-            { id: 6, type: 'B', weight: 230, price: 18000000, image: 'https://picsum.photos/seed/cow6/400/300' },
-            { id: 7, type: 'C', weight: 240, price: 19000000, image: 'https://picsum.photos/seed/cow7/400/300' },
-            { id: 8, type: 'C', weight: 250, price: 19500000, image: 'https://picsum.photos/seed/cow8/400/300' },
-            { id: 9, type: 'C', weight: 255, price: 20000000, image: 'https://picsum.photos/seed/cow9/400/300' },
-            { id: 10, type: 'SUPER', weight: 260, price: 21000000, image: 'https://picsum.photos/seed/cow10/400/300' },
-            { id: 11, type: 'A', weight: 190, price: 15200000, image: 'https://picsum.photos/seed/cow11/400/300' },
-            { id: 12, type: 'A', weight: 198, price: 15600000, image: 'https://picsum.photos/seed/cow12/400/300' },
-            { id: 13, type: 'B', weight: 215, price: 17200000, image: 'https://picsum.photos/seed/cow13/400/300' },
-            { id: 14, type: 'B', weight: 225, price: 17800000, image: 'https://picsum.photos/seed/cow14/400/300' },
-            { id: 15, type: 'C', weight: 235, price: 19200000, image: 'https://picsum.photos/seed/cow15/400/300' },
-            { id: 16, type: 'C', weight: 245, price: 19800000, image: 'https://picsum.photos/seed/cow16/400/300' },
-            { id: 17, type: 'SUPER', weight: 280, price: 22000000, image: 'https://picsum.photos/seed/cow17/400/300' },
-            { id: 18, type: 'SUPER', weight: 300, price: 23000000, image: 'https://picsum.photos/seed/cow18/400/300' },
-            { id: 19, type: 'A', weight: 192, price: 15300000, image: 'https://picsum.photos/seed/cow19/400/300' },
-            { id: 20, type: 'B', weight: 218, price: 17400000, image: 'https://picsum.photos/seed/cow20/400/300' },
-            { id: 21, type: 'A', weight: 196, price: 15400000, image: 'https://picsum.photos/seed/cow21/400/300' },
-            { id: 22, type: 'B', weight: 222, price: 17600000, image: 'https://picsum.photos/seed/cow22/400/300' },
-            { id: 23, type: 'C', weight: 242, price: 19400000, image: 'https://picsum.photos/seed/cow23/400/300' },
-            { id: 24, type: 'SUPER', weight: 290, price: 22500000, image: 'https://picsum.photos/seed/cow24/400/300' },
-            { id: 25, type: 'A', weight: 185, price: 15000000, image: 'https://picsum.photos/seed/cow25/400/300' },
-            { id: 26, type: 'B', weight: 212, price: 17100000, image: 'https://picsum.photos/seed/cow26/400/300' },
-            { id: 27, type: 'C', weight: 238, price: 19100000, image: 'https://picsum.photos/seed/cow27/400/300' },
-            { id: 28, type: 'SUPER', weight: 310, price: 23500000, image: 'https://picsum.photos/seed/cow28/400/300' },
-            { id: 29, type: 'A', weight: 199, price: 15700000, image: 'https://picsum.photos/seed/cow29/400/300' },
-            { id: 30, type: 'B', weight: 227, price: 17900000, image: 'https://picsum.photos/seed/cow30/400/300' },
-            { id: 31, type: 'A', weight: 188, price: 15100000, image: 'https://picsum.photos/seed/cow31/400/300' },
-            { id: 32, type: 'B', weight: 214, price: 17300000, image: 'https://picsum.photos/seed/cow32/400/300' },
-            { id: 33, type: 'C', weight: 248, price: 19700000, image: 'https://picsum.photos/seed/cow33/400/300' },
-            { id: 34, type: 'SUPER', weight: 320, price: 24000000, image: 'https://picsum.photos/seed/cow34/400/300' },
-            { id: 35, type: 'A', weight: 202, price: 15900000, image: 'https://picsum.photos/seed/cow35/400/300' },
-            { id: 36, type: 'B', weight: 232, price: 18100000, image: 'https://picsum.photos/seed/cow36/400/300' },
-            { id: 37, type: 'C', weight: 252, price: 19900000, image: 'https://picsum.photos/seed/cow37/400/300' },
-            { id: 38, type: 'SUPER', weight: 340, price: 25000000, image: 'https://picsum.photos/seed/cow38/400/300' },
-            { id: 39, type: 'A', weight: 194, price: 15500000, image: 'https://picsum.photos/seed/cow39/400/300' },
-            { id: 40, type: 'B', weight: 224, price: 17700000, image: 'https://picsum.photos/seed/cow40/400/300' },
-            { id: 41, type: 'A', weight: 191, price: 15300000, image: 'https://picsum.photos/seed/cow41/400/300' },
-            { id: 42, type: 'B', weight: 219, price: 17500000, image: 'https://picsum.photos/seed/cow42/400/300' },
-            { id: 43, type: 'C', weight: 239, price: 19300000, image: 'https://picsum.photos/seed/cow43/400/300' },
-            { id: 44, type: 'SUPER', weight: 270, price: 21500000, image: 'https://picsum.photos/seed/cow44/400/300' },
-            { id: 45, type: 'A', weight: 203, price: 16000000, image: 'https://picsum.photos/seed/cow45/400/300' },
-            { id: 46, type: 'B', weight: 233, price: 18200000, image: 'https://picsum.photos/seed/cow46/400/300' },
-            { id: 47, type: 'C', weight: 253, price: 20000000, image: 'https://picsum.photos/seed/cow47/400/300' },
-            { id: 48, type: 'SUPER', weight: 330, price: 24500000, image: 'https://picsum.photos/seed/cow48/400/300' },
-            { id: 49, type: 'A', weight: 189, price: 15200000, image: 'https://picsum.photos/seed/cow49/400/300' },
-            { id: 50, type: 'B', weight: 216, price: 17400000, image: 'https://picsum.photos/seed/cow50/400/300' },
-            { id: 51, type: 'A', weight: 186, price: 15050000, image: 'https://picsum.photos/seed/cow51/400/300' },
-            { id: 52, type: 'B', weight: 211, price: 17050000, image: 'https://picsum.photos/seed/cow52/400/300' },
-            { id: 53, type: 'C', weight: 237, price: 19150000, image: 'https://picsum.photos/seed/cow53/400/300' },
-            { id: 54, type: 'SUPER', weight: 295, price: 22800000, image: 'https://picsum.photos/seed/cow54/400/300' },
-            { id: 55, type: 'A', weight: 197, price: 15650000, image: 'https://picsum.photos/seed/cow55/400/300' },
-            { id: 56, type: 'B', weight: 228, price: 17950000, image: 'https://picsum.photos/seed/cow56/400/300' },
-            { id: 57, type: 'C', weight: 249, price: 19850000, image: 'https://picsum.photos/seed/cow57/400/300' },
-            { id: 58, type: 'SUPER', weight: 350, price: 26000000, image: 'https://picsum.photos/seed/cow58/400/300' },
-            { id: 59, type: 'A', weight: 193, price: 15450000, image: 'https://picsum.photos/seed/cow59/400/300' },
-            { id: 60, type: 'B', weight: 223, price: 17750000, image: 'https://picsum.photos/seed/cow60/400/300' },
-            { id: 61, type: 'A', weight: 187, price: 15150000, image: 'https://picsum.photos/seed/cow61/400/300' },
-            { id: 62, type: 'B', weight: 213, price: 17150000, image: 'https://picsum.photos/seed/cow62/400/300' },
-            { id: 63, type: 'C', weight: 241, price: 19350000, image: 'https://picsum.photos/seed/cow63/400/300' },
-            { id: 64, type: 'SUPER', weight: 305, price: 23200000, image: 'https://picsum.photos/seed/cow64/400/300' },
-            { id: 65, type: 'A', weight: 204, price: 15850000, image: 'https://picsum.photos/seed/cow65/400/300' },
-            { id: 66, type: 'B', weight: 234, price: 18050000, image: 'https://picsum.photos/seed/cow66/400/300' },
-            { id: 67, type: 'C', weight: 254, price: 19950000, image: 'https://picsum.photos/seed/cow67/400/300' },
-            { id: 68, type: 'SUPER', weight: 360, price: 27000000, image: 'https://picsum.photos/seed/cow68/400/300' },
-            { id: 69, type: 'A', weight: 195, price: 15550000, image: 'https://picsum.photos/seed/cow69/400/300' },
-            { id: 70, type: 'B', weight: 225, price: 17850000, image: 'https://picsum.photos/seed/cow70/400/300' },
-            { id: 71, type: 'A', weight: 190, price: 15250000, image: 'https://picsum.photos/seed/cow71/400/300' },
-            { id: 72, type: 'B', weight: 220, price: 17550000, image: 'https://picsum.photos/seed/cow72/400/300' },
-            { id: 73, type: 'C', weight: 246, price: 19650000, image: 'https://picsum.photos/seed/cow73/400/300' },
-            { id: 74, type: 'SUPER', weight: 315, price: 23800000, image: 'https://picsum.photos/seed/cow74/400/300' },
-            { id: 75, type: 'A', weight: 201, price: 15750000, image: 'https://picsum.photos/seed/cow75/400/300' },
-            { id: 76, type: 'B', weight: 231, price: 18150000, image: 'https://picsum.photos/seed/cow76/400/300' },
-            { id: 77, type: 'C', weight: 251, price: 20050000, image: 'https://picsum.photos/seed/cow77/400/300' },
-            { id: 78, type: 'SUPER', weight: 370, price: 28000000, image: 'https://picsum.photos/seed/cow78/400/300' },
-            { id: 79, type: 'A', weight: 192, price: 15350000, image: 'https://picsum.photos/seed/cow79/400/300' },
-            { id: 80, type: 'B', weight: 217, price: 17650000, image: 'https://picsum.photos/seed/cow80/400/300' },
-            { id: 81, type: 'A', weight: 188, price: 15200000, image: 'https://picsum.photos/seed/cow81/400/300' },
-            { id: 82, type: 'B', weight: 218, price: 17300000, image: 'https://picsum.photos/seed/cow82/400/300' },
-            { id: 83, type: 'C', weight: 243, price: 19400000, image: 'https://picsum.photos/seed/cow83/400/300' },
-            { id: 84, type: 'SUPER', weight: 325, price: 24200000, image: 'https://picsum.photos/seed/cow84/400/300' },
-            { id: 85, type: 'A', weight: 202, price: 15800000, image: 'https://picsum.photos/seed/cow85/400/300' },
-            { id: 86, type: 'B', weight: 232, price: 18000000, image: 'https://picsum.photos/seed/cow86/400/300' },
-            { id: 87, type: 'C', weight: 252, price: 19900000, image: 'https://picsum.photos/seed/cow87/400/300' },
-            { id: 88, type: 'SUPER', weight: 380, price: 29000000, image: 'https://picsum.photos/seed/cow88/400/300' },
-            { id: 89, type: 'A', weight: 194, price: 15400000, image: 'https://picsum.photos/seed/cow89/400/300' },
-            { id: 90, type: 'B', weight: 224, price: 17700000, image: 'https://picsum.photos/seed/cow90/400/300' },
-            { id: 91, type: 'A', weight: 199, price: 15600000, image: 'https://picsum.photos/seed/cow91/400/300' },
-            { id: 92, type: 'B', weight: 229, price: 17900000, image: 'https://picsum.photos/seed/cow92/400/300' },
-            { id: 93, type: 'C', weight: 247, price: 19700000, image: 'https://picsum.photos/seed/cow93/400/300' },
-            { id: 94, type: 'SUPER', weight: 400, price: 30000000, image: 'https://picsum.photos/seed/cow94/400/300' },
-            { id: 95, type: 'A', weight: 205, price: 16000000, image: 'https://picsum.photos/seed/cow95/400/300' },
-            { id: 96, type: 'B', weight: 235, price: 18200000, image: 'https://picsum.photos/seed/cow96/400/300' },
-            { id: 97, type: 'C', weight: 255, price: 20100000, image: 'https://picsum.photos/seed/cow97/400/300' },
-            { id: 98, type: 'SUPER', weight: 420, price: 32000000, image: 'https://picsum.photos/seed/cow98/400/300' },
-            { id: 99, type: 'A', weight: 196, price: 15500000, image: 'https://picsum.photos/seed/cow99/400/300' },
-            { id: 100, type: 'B', weight: 226, price: 17800000, image: 'https://picsum.photos/seed/cow100/400/300' }
+            { id: 1, type: 'A', weight: 195, price: 15500000, image: 'https://picsum.photos/seed/cow1/400/300', video: '' },
+            { id: 2, type: 'A', weight: 200, price: 15800000, image: 'https://picsum.photos/seed/cow2/400/300', video: '' },
+            { id: 3, type: 'A', weight: 205, price: 16000000, image: 'https://picsum.photos/seed/cow3/400/300', video: '' },
+            { id: 4, type: 'B', weight: 210, price: 17000000, image: 'https://picsum.photos/seed/cow4/400/300', video: '' },
+            { id: 5, type: 'B', weight: 220, price: 17500000, image: 'https://picsum.photos/seed/cow5/400/300', video: '' },
+            { id: 6, type: 'B', weight: 230, price: 18000000, image: 'https://picsum.photos/seed/cow6/400/300', video: '' },
+            { id: 7, type: 'C', weight: 240, price: 19000000, image: 'https://picsum.photos/seed/cow7/400/300', video: '' },
+            { id: 8, type: 'C', weight: 250, price: 19500000, image: 'https://picsum.photos/seed/cow8/400/300', video: '' },
+            { id: 9, type: 'C', weight: 255, price: 20000000, image: 'https://picsum.photos/seed/cow9/400/300', video: '' },
+            { id: 10, type: 'SUPER', weight: 260, price: 21000000, image: 'https://picsum.photos/seed/cow10/400/300', video: 'https://www.w3schools.com/html/mov_bbb.mp4' }, // CONTOH: Sapi 10 pakai video
+            { id: 11, type: 'A', weight: 190, price: 15200000, image: 'https://picsum.photos/seed/cow11/400/300', video: '' },
+            { id: 12, type: 'A', weight: 198, price: 15600000, image: 'https://picsum.photos/seed/cow12/400/300', video: '' },
+            { id: 13, type: 'B', weight: 215, price: 17200000, image: 'https://picsum.photos/seed/cow13/400/300', video: '' },
+            { id: 14, type: 'B', weight: 225, price: 17800000, image: 'https://picsum.photos/seed/cow14/400/300', video: '' },
+            { id: 15, type: 'C', weight: 235, price: 19200000, image: 'https://picsum.photos/seed/cow15/400/300', video: '' },
+            { id: 16, type: 'C', weight: 245, price: 19800000, image: 'https://picsum.photos/seed/cow16/400/300', video: '' },
+            { id: 17, type: 'SUPER', weight: 280, price: 22000000, image: 'https://picsum.photos/seed/cow17/400/300', video: '' },
+            { id: 18, type: 'SUPER', weight: 300, price: 23000000, image: 'https://picsum.photos/seed/cow18/400/300', video: '' },
+            { id: 19, type: 'A', weight: 192, price: 15300000, image: 'https://picsum.photos/seed/cow19/400/300', video: '' },
+            { id: 20, type: 'B', weight: 218, price: 17400000, image: 'https://picsum.photos/seed/cow20/400/300', video: '' },
+            { id: 21, type: 'A', weight: 196, price: 15400000, image: 'https://picsum.photos/seed/cow21/400/300', video: '' },
+            { id: 22, type: 'B', weight: 222, price: 17600000, image: 'https://picsum.photos/seed/cow22/400/300', video: '' },
+            { id: 23, type: 'C', weight: 242, price: 19400000, image: 'https://picsum.photos/seed/cow23/400/300', video: '' },
+            { id: 24, type: 'SUPER', weight: 290, price: 22500000, image: 'https://picsum.photos/seed/cow24/400/300', video: '' },
+            { id: 25, type: 'A', weight: 185, price: 15000000, image: 'https://picsum.photos/seed/cow25/400/300', video: '' },
+            { id: 26, type: 'B', weight: 212, price: 17100000, image: 'https://picsum.photos/seed/cow26/400/300', video: '' },
+            { id: 27, type: 'C', weight: 238, price: 19100000, image: 'https://picsum.photos/seed/cow27/400/300', video: '' },
+            { id: 28, type: 'SUPER', weight: 310, price: 23500000, image: 'https://picsum.photos/seed/cow28/400/300', video: '' },
+            { id: 29, type: 'A', weight: 199, price: 15700000, image: 'https://picsum.photos/seed/cow29/400/300', video: '' },
+            { id: 30, type: 'B', weight: 227, price: 17900000, image: 'https://picsum.photos/seed/cow30/400/300', video: '' },
+            { id: 31, type: 'A', weight: 188, price: 15100000, image: 'https://picsum.photos/seed/cow31/400/300', video: '' },
+            { id: 32, type: 'B', weight: 214, price: 17300000, image: 'https://picsum.photos/seed/cow32/400/300', video: '' },
+            { id: 33, type: 'C', weight: 248, price: 19700000, image: 'https://picsum.photos/seed/cow33/400/300', video: '' },
+            { id: 34, type: 'SUPER', weight: 320, price: 24000000, image: 'https://picsum.photos/seed/cow34/400/300', video: '' },
+            { id: 35, type: 'A', weight: 202, price: 15900000, image: 'https://picsum.photos/seed/cow35/400/300', video: '' },
+            { id: 36, type: 'B', weight: 232, price: 18100000, image: 'https://picsum.photos/seed/cow36/400/300', video: '' },
+            { id: 37, type: 'C', weight: 252, price: 19900000, image: 'https://picsum.photos/seed/cow37/400/300', video: '' },
+            { id: 38, type: 'SUPER', weight: 340, price: 25000000, image: 'https://picsum.photos/seed/cow38/400/300', video: '' },
+            { id: 39, type: 'A', weight: 194, price: 15500000, image: 'https://picsum.photos/seed/cow39/400/300', video: '' },
+            { id: 40, type: 'B', weight: 224, price: 17700000, image: 'https://picsum.photos/seed/cow40/400/300', video: '' },
+            { id: 41, type: 'A', weight: 191, price: 15300000, image: 'https://picsum.photos/seed/cow41/400/300', video: '' },
+            { id: 42, type: 'B', weight: 219, price: 17500000, image: 'https://picsum.photos/seed/cow42/400/300', video: '' },
+            { id: 43, type: 'C', weight: 239, price: 19300000, image: 'https://picsum.photos/seed/cow43/400/300', video: '' },
+            { id: 44, type: 'SUPER', weight: 270, price: 21500000, image: 'https://picsum.photos/seed/cow44/400/300', video: '' },
+            { id: 45, type: 'A', weight: 203, price: 16000000, image: 'https://picsum.photos/seed/cow45/400/300', video: '' },
+            { id: 46, type: 'B', weight: 233, price: 18200000, image: 'https://picsum.photos/seed/cow46/400/300', video: '' },
+            { id: 47, type: 'C', weight: 253, price: 20000000, image: 'https://picsum.photos/seed/cow47/400/300', video: '' },
+            { id: 48, type: 'SUPER', weight: 330, price: 24500000, image: 'https://picsum.photos/seed/cow48/400/300', video: '' },
+            { id: 49, type: 'A', weight: 189, price: 15200000, image: 'https://picsum.photos/seed/cow49/400/300', video: '' },
+            { id: 50, type: 'B', weight: 216, price: 17400000, image: 'https://picsum.photos/seed/cow50/400/300', video: '' },
+            { id: 51, type: 'A', weight: 186, price: 15050000, image: 'https://picsum.photos/seed/cow51/400/300', video: '' },
+            { id: 52, type: 'B', weight: 211, price: 17050000, image: 'https://picsum.photos/seed/cow52/400/300', video: '' },
+            { id: 53, type: 'C', weight: 237, price: 19150000, image: 'https://picsum.photos/seed/cow53/400/300', video: '' },
+            { id: 54, type: 'SUPER', weight: 295, price: 22800000, image: 'https://picsum.photos/seed/cow54/400/300', video: '' },
+            { id: 55, type: 'A', weight: 197, price: 15650000, image: 'https://picsum.photos/seed/cow55/400/300', video: '' },
+            { id: 56, type: 'B', weight: 228, price: 17950000, image: 'https://picsum.photos/seed/cow56/400/300', video: '' },
+            { id: 57, type: 'C', weight: 249, price: 19850000, image: 'https://picsum.photos/seed/cow57/400/300', video: '' },
+            { id: 58, type: 'SUPER', weight: 350, price: 26000000, image: 'https://picsum.photos/seed/cow58/400/300', video: '' },
+            { id: 59, type: 'A', weight: 193, price: 15450000, image: 'https://picsum.photos/seed/cow59/400/300', video: '' },
+            { id: 60, type: 'B', weight: 223, price: 17750000, image: 'https://picsum.photos/seed/cow60/400/300', video: '' },
+            { id: 61, type: 'A', weight: 187, price: 15150000, image: 'https://picsum.photos/seed/cow61/400/300', video: '' },
+            { id: 62, type: 'B', weight: 213, price: 17150000, image: 'https://picsum.photos/seed/cow62/400/300', video: '' },
+            { id: 63, type: 'C', weight: 241, price: 19350000, image: 'https://picsum.photos/seed/cow63/400/300', video: '' },
+            { id: 64, type: 'SUPER', weight: 305, price: 23200000, image: 'https://picsum.photos/seed/cow64/400/300', video: '' },
+            { id: 65, type: 'A', weight: 204, price: 15850000, image: 'https://picsum.photos/seed/cow65/400/300', video: '' },
+            { id: 66, type: 'B', weight: 234, price: 18050000, image: 'https://picsum.photos/seed/cow66/400/300', video: '' },
+            { id: 67, type: 'C', weight: 254, price: 19950000, image: 'https://picsum.photos/seed/cow67/400/300', video: '' },
+            { id: 68, type: 'SUPER', weight: 360, price: 27000000, image: 'https://picsum.photos/seed/cow68/400/300', video: '' },
+            { id: 69, type: 'A', weight: 195, price: 15550000, image: 'https://picsum.photos/seed/cow69/400/300', video: '' },
+            { id: 70, type: 'B', weight: 225, price: 17850000, image: 'https://picsum.photos/seed/cow70/400/300', video: '' },
+            { id: 71, type: 'A', weight: 190, price: 15250000, image: 'https://picsum.photos/seed/cow71/400/300', video: '' },
+            { id: 72, type: 'B', weight: 220, price: 17550000, image: 'https://picsum.photos/seed/cow72/400/300', video: '' },
+            { id: 73, type: 'C', weight: 246, price: 19650000, image: 'https://picsum.photos/seed/cow73/400/300', video: '' },
+            { id: 74, type: 'SUPER', weight: 315, price: 23800000, image: 'https://picsum.photos/seed/cow74/400/300', video: '' },
+            { id: 75, type: 'A', weight: 201, price: 15750000, image: 'https://picsum.photos/seed/cow75/400/300', video: '' },
+            { id: 76, type: 'B', weight: 231, price: 18150000, image: 'https://picsum.photos/seed/cow76/400/300', video: '' },
+            { id: 77, type: 'C', weight: 251, price: 20050000, image: 'https://picsum.photos/seed/cow77/400/300', video: '' },
+            { id: 78, type: 'SUPER', weight: 370, price: 28000000, image: 'https://picsum.photos/seed/cow78/400/300', video: '' },
+            { id: 79, type: 'A', weight: 192, price: 15350000, image: 'https://picsum.photos/seed/cow79/400/300', video: '' },
+            { id: 80, type: 'B', weight: 217, price: 17650000, image: 'https://picsum.photos/seed/cow80/400/300', video: '' },
+            { id: 81, type: 'A', weight: 188, price: 15200000, image: 'https://picsum.photos/seed/cow81/400/300', video: '' },
+            { id: 82, type: 'B', weight: 218, price: 17300000, image: 'https://picsum.photos/seed/cow82/400/300', video: '' },
+            { id: 83, type: 'C', weight: 243, price: 19400000, image: 'https://picsum.photos/seed/cow83/400/300', video: '' },
+            { id: 84, type: 'SUPER', weight: 325, price: 24200000, image: 'https://picsum.photos/seed/cow84/400/300', video: '' },
+            { id: 85, type: 'A', weight: 202, price: 15800000, image: 'https://picsum.photos/seed/cow85/400/300', video: '' },
+            { id: 86, type: 'B', weight: 232, price: 18000000, image: 'https://picsum.photos/seed/cow86/400/300', video: '' },
+            { id: 87, type: 'C', weight: 252, price: 19900000, image: 'https://picsum.photos/seed/cow87/400/300', video: '' },
+            { id: 88, type: 'SUPER', weight: 380, price: 29000000, image: 'https://picsum.photos/seed/cow88/400/300', video: '' },
+            { id: 89, type: 'A', weight: 194, price: 15400000, image: 'https://picsum.photos/seed/cow89/400/300', video: '' },
+            { id: 90, type: 'B', weight: 224, price: 17700000, image: 'https://picsum.photos/seed/cow90/400/300', video: '' },
+            { id: 91, type: 'A', weight: 199, price: 15600000, image: 'https://picsum.photos/seed/cow91/400/300', video: '' },
+            { id: 92, type: 'B', weight: 229, price: 17900000, image: 'https://picsum.photos/seed/cow92/400/300', video: '' },
+            { id: 93, type: 'C', weight: 247, price: 19700000, image: 'https://picsum.photos/seed/cow93/400/300', video: '' },
+            { id: 94, type: 'SUPER', weight: 400, price: 30000000, image: 'https://picsum.photos/seed/cow94/400/300', video: '' },
+            { id: 95, type: 'A', weight: 205, price: 16000000, image: 'https://picsum.photos/seed/cow95/400/300', video: '' },
+            { id: 96, type: 'B', weight: 235, price: 18200000, image: 'https://picsum.photos/seed/cow96/400/300', video: '' },
+            { id: 97, type: 'C', weight: 255, price: 20100000, image: 'https://picsum.photos/seed/cow97/400/300', video: '' },
+            { id: 98, type: 'SUPER', weight: 420, price: 32000000, image: 'https://picsum.photos/seed/cow98/400/300', video: '' },
+            { id: 99, type: 'A', weight: 196, price: 15500000, image: 'https://picsum.photos/seed/cow99/400/300', video: '' },
+            { id: 100, type: 'B', weight: 226, price: 17800000, image: 'https://picsum.photos/seed/cow100/400/300', video: '' }
         ];
 
         // --- LOADING SCREEN LOGIC ---
@@ -1688,6 +1757,7 @@
                 const weight = data.weight;
                 const price = data.price;
                 const imgSrc = data.image;
+                const vidSrc = data.video;
                 
                 // Format angka
                 const priceFormatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
@@ -1705,7 +1775,8 @@
                 // Struktur HTML
                 card.innerHTML = `
                     <div class="template-preview">
-                        <img src="${imgSrc}" alt="${selectedType}">
+                        <!-- FIX: ONCLICK DI IMAGE UNTUK LIGHTBOX (FULL SCREEN) -->
+                        <img src="${imgSrc}" alt="${selectedType}" onclick="event.stopPropagation(); openLightbox('${imgSrc}')" style="cursor: zoom-in;">
                     </div>
                     <div class="template-info">
                         <h3>Sapi Type ${selectedType} #${id.toString().padStart(3, '0')}</h3>
@@ -1719,6 +1790,7 @@
                                             data-weight="${weight} Kg" 
                                             data-price="${priceFormatted}"
                                             data-img="${imgSrc}"
+                                            data-video="${vidSrc}"
                                             title="Lihat Detail">
                                     <i class="fas fa-info-circle"></i>
                                 </button>
@@ -1861,25 +1933,46 @@
             }
         }
 
-        // --- DETAIL LOGIC ---
+        // --- DETAIL LOGIC (UPDATED: VIDEO SUPPORT) ---
         function openDetail(btnElement) {
             // Get data from button's data-attributes
             const type = btnElement.getAttribute('data-type');
             const weight = btnElement.getAttribute('data-weight');
             const price = btnElement.getAttribute('data-price');
             const imgSrc = btnElement.getAttribute('data-img');
+            const vidSrc = btnElement.getAttribute('data-video');
 
             // Fill Modal
             document.getElementById('detailTypeDisplay').innerText = type;
             document.getElementById('detailWeightDisplay').innerText = weight;
             document.getElementById('detailPriceDisplay').innerText = price;
-            document.getElementById('detailImgDisplay').src = imgSrc;
+
+            // Logic Video vs Image
+            const videoEl = document.getElementById('detailVideoDisplay');
+            const imgEl = document.getElementById('detailImgDisplay');
+
+            if (vidSrc && vidSrc !== '') {
+                // Ada Video: Show Video, Hide Image
+                videoEl.src = vidSrc;
+                videoEl.style.display = 'block';
+                imgEl.style.display = 'none';
+            } else {
+                // Tidak Ada Video: Show Image, Hide Video
+                videoEl.style.display = 'none';
+                imgEl.src = imgSrc;
+                imgEl.style.display = 'block';
+            }
 
             // Show Modal
             document.getElementById('detailModal').classList.add('show');
         }
 
         function closeDetail() {
+            // Stop video saat tutup modal
+            const videoEl = document.getElementById('detailVideoDisplay');
+            if(videoEl.style.display === 'block') {
+                videoEl.pause();
+            }
             document.getElementById('detailModal').classList.remove('show');
         }
 
@@ -2042,21 +2135,21 @@
             }
         });
 
-        // --- TOAST SYSTEM ---
-        function showToast(message) {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `<i class="fas fa-check-circle" style="color: var(--primary);"></i> ${message}`;
+        // --- FIX: LIGHTBOX LOGIC (FULL SCREEN IMAGE) ---
+        function openLightbox(imgSrc) {
+            const overlay = document.getElementById('lightboxOverlay');
+            const img = document.getElementById('lightboxImage');
             
-            container.appendChild(toast);
+            img.src = imgSrc;
+            overlay.classList.add('show');
+        }
+
+        function closeLightbox() {
+            const overlay = document.getElementById('lightboxOverlay');
+            // Opsional: Bersihkan src untuk mencegah flash gambar lama saat dibuka lagi
+            // document.getElementById('lightboxImage').src = ''; 
             
-            setTimeout(() => {
-                toast.style.opacity = '0';
-                toast.style.transform = 'translateX(100%)';
-                toast.style.transition = 'all 0.3s ease';
-                setTimeout(() => toast.remove(), 300);
-            }, 3000);
+            overlay.classList.remove('show');
         }
 
         // --- ANIMATION OBSERVER ---
