@@ -982,7 +982,7 @@
     <!-- UPDATE: LOADING SCREEN -->
     <div id="loading-screen">
         <div class="loader-spinner"></div>
-        <h3 style="color: var(--primary);">Memuat Kandang...</h3>
+        <h3 style="color: var(--primary);">Loading...</h3>
     </div>
 
     <div class="bg-pattern"></div>
@@ -1068,7 +1068,7 @@
 
                     <p class="hero-desc">
                         Pusatnya sapi kurban sehat, gemuk, dan terawat dengan baik. 
-                        Kandang Lembu Kembar siap memenuhi kebutuhan qurban Idul Adha Anda dengan pelayanan terbaik.
+                        Kandang Lembu Kembar siap memenuhi kebutuhan kurban Idul Adha Anda dengan pelayanan terbaik.
                     </p>
 
                     <div style="display: flex; gap: 1rem; justify-content: center;">
@@ -1102,7 +1102,7 @@
                             <option value="C">Type C</option>
                             <option value="SUPER">Super</option>
                         </select>
-                        <!-- UPDATE: SORTING DROPDOWN -->
+                        <!-- SORTING DROPDOWN -->
                         <select id="sortSelect" class="filter-select" onchange="sortCows()">
                             <option value="default">Urutkan...</option>
                             <option value="price-asc">Harga Termurah</option>
@@ -1112,7 +1112,7 @@
                         </select>
                     </div>
 
-                    <!-- UPDATE: NO RESULTS MESSAGE -->
+                    <!-- NO RESULTS MESSAGE -->
                     <div id="noResultsMsg" class="no-results-msg">
                         <i class="fas fa-search"></i>
                         <h3>Tidak ditemukan</h3>
@@ -1153,7 +1153,7 @@
                         </div>
 
                         <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-dark);">Dokumentasi Pengiriman</h3>
-                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem;">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
                             <div style="aspect-ratio: 1; background: #eee; border-radius: 8px; overflow: hidden; position: relative;">
                                 <img src="https://picsum.photos/seed/dok1/150/150" alt="Dok" style="width: 100%; height: 100%; object-fit: cover;">
                                 <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; font-size: 0.7rem; padding: 4px;">Area Jakarta</div>
@@ -1180,6 +1180,27 @@
                                 <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; font-size: 0.7rem; padding: 4px;">Area Bogor</div>
                             </div>
                         </div>
+
+                        <!-- TAMBAHAN: PETA LOKASI -->
+                        <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-dark);">Lokasi Kandang</h3>
+                        <div style="width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid var(--text-light); margin-bottom: 1rem;">
+                            <iframe 
+                                width="100%" 
+                                height="300px" 
+                                frameborder="0" 
+                                scrolling="no" 
+                                marginheight="0" 
+                                marginwidth="0" 
+                                style="border:0;" 
+                                src="https://maps.google.com/maps?q=-6.311755,107.063460&t=&z=15&ie=UTF8&iwloc=&output=embed"
+                            ></iframe>
+                        </div>
+                        <p style="font-size: 0.85rem; color: var(--text-light); margin-bottom: 1rem;">
+                            Kandang kami berlokasi strategis di Cikarang Barat, Bekasi. Jangkauan mudah diakses dari tol maupun jalan arteri. Silakan berkunjung langsung untuk melihat kesiapan hewan ternak kami.
+                        </p>
+                        <a href="https://maps.google.com/maps?q=-6.311755,107.063460" target="_blank" class="btn-canva btn-ghost" style="border: 1px solid var(--text-light); width: 100%; justify-content: center;">
+                            <i class="fas fa-map-marker-alt" style="margin-right: 8px; color: var(--primary);"></i> Buka di Google Maps
+                        </a>
                     </div>
 
                     <!-- Right: Spesifikasi & Jaminan (Properties) -->
@@ -1248,7 +1269,7 @@
 
                 <!-- TESTIMONIALS -->
                 <div>
-                    <div class="property-title">Kata Sahabat Pequrban</div>
+                    <div class="property-title">Kata Sahabat Pekurban</div>
                     <div class="color-grid">
                         <div class="testimonial-swatch" style="flex: 1; min-width: 250px;">
                             <div class="swatch-header">
@@ -1307,6 +1328,10 @@
                         <div class="footer-col">
                             <h4>Hubungi Kami</h4>
                             <p><i class="fas fa-map-marker-alt" style="width:20px;"></i> Jl. Raya Kp. Setu Rawa Banteng Ds. Mekarwangi, Kec. Cikarang Barat Bekasi</p>
+                            <!-- UPDATE: LINK GOOGLE MAPS -->
+                            <a href="https://maps.google.com/maps?q=-6.311755,107.063460" target="_blank" style="color: var(--primary); font-weight: 600;">
+                                <i class="fas fa-location-arrow" style="width:20px;"></i> Lihat di Google Maps
+                            </a>
                             <p><i class="fas fa-phone" style="width:20px;"></i> +62 858 9310 7859 Mahmud Arifin</p>
                             <p><i class="fas fa-phone" style="width:20px;"></i> +62 896 8755 2388 Ahmad Jumyana</p>
                             <p><i class="fas fa-envelope" style="width:20px;"></i> Kandanglembukembar448@gmail.com</p>
@@ -1519,10 +1544,10 @@
     <script>
         // --- UPDATE: DATA STATIS UNTUK 100 SAPI ---
         // Silakan edit data di bawah ini sesuai kebutuhan.
-        // image: Ganti URL dengan path gambar lokal Anda (contoh: "images/sapi-01.jpg")
+        // image: Ganti URL dengan path gambar lokal Anda (contoh: "images/sapi1.jpg")
         // type: Tipe sapi (A, B, C, SUPER)
         // weight: Bobot dalam Kg
-        // price: Harga dalam angka (tanpa titik/koma)
+        // price: Harga dalam angka (tanpa titik)
         const cowData = [
             { id: 1, type: 'A', weight: 195, price: 15500000, image: 'https://picsum.photos/seed/cow1/400/300' },
             { id: 2, type: 'A', weight: 200, price: 15800000, image: 'https://picsum.photos/seed/cow2/400/300' },
