@@ -1102,7 +1102,7 @@
                             <option value="C">Type C</option>
                             <option value="SUPER">Super</option>
                         </select>
-                        <!-- SORTING DROPDOWN -->
+                        <!-- UPDATE: SORTING DROPDOWN -->
                         <select id="sortSelect" class="filter-select" onchange="sortCows()">
                             <option value="default">Urutkan...</option>
                             <option value="price-asc">Harga Termurah</option>
@@ -1112,7 +1112,7 @@
                         </select>
                     </div>
 
-                    <!-- NO RESULTS MESSAGE -->
+                    <!-- UPDATE: NO RESULTS MESSAGE -->
                     <div id="noResultsMsg" class="no-results-msg">
                         <i class="fas fa-search"></i>
                         <h3>Tidak ditemukan</h3>
@@ -1517,6 +1517,115 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
+        // --- UPDATE: DATA STATIS UNTUK 100 SAPI ---
+        // Silakan edit data di bawah ini sesuai kebutuhan.
+        // image: Ganti URL dengan path gambar lokal Anda (contoh: "images/sapi-01.jpg")
+        // type: Tipe sapi (A, B, C, SUPER)
+        // weight: Bobot dalam Kg
+        // price: Harga dalam angka (tanpa titik/koma)
+        const cowData = [
+            { id: 1, type: 'A', weight: 195, price: 15500000, image: 'https://picsum.photos/seed/cow1/400/300' },
+            { id: 2, type: 'A', weight: 200, price: 15800000, image: 'https://picsum.photos/seed/cow2/400/300' },
+            { id: 3, type: 'A', weight: 205, price: 16000000, image: 'https://picsum.photos/seed/cow3/400/300' },
+            { id: 4, type: 'B', weight: 210, price: 17000000, image: 'https://picsum.photos/seed/cow4/400/300' },
+            { id: 5, type: 'B', weight: 220, price: 17500000, image: 'https://picsum.photos/seed/cow5/400/300' },
+            { id: 6, type: 'B', weight: 230, price: 18000000, image: 'https://picsum.photos/seed/cow6/400/300' },
+            { id: 7, type: 'C', weight: 240, price: 19000000, image: 'https://picsum.photos/seed/cow7/400/300' },
+            { id: 8, type: 'C', weight: 250, price: 19500000, image: 'https://picsum.photos/seed/cow8/400/300' },
+            { id: 9, type: 'C', weight: 255, price: 20000000, image: 'https://picsum.photos/seed/cow9/400/300' },
+            { id: 10, type: 'SUPER', weight: 260, price: 21000000, image: 'https://picsum.photos/seed/cow10/400/300' },
+            { id: 11, type: 'A', weight: 190, price: 15200000, image: 'https://picsum.photos/seed/cow11/400/300' },
+            { id: 12, type: 'A', weight: 198, price: 15600000, image: 'https://picsum.photos/seed/cow12/400/300' },
+            { id: 13, type: 'B', weight: 215, price: 17200000, image: 'https://picsum.photos/seed/cow13/400/300' },
+            { id: 14, type: 'B', weight: 225, price: 17800000, image: 'https://picsum.photos/seed/cow14/400/300' },
+            { id: 15, type: 'C', weight: 235, price: 19200000, image: 'https://picsum.photos/seed/cow15/400/300' },
+            { id: 16, type: 'C', weight: 245, price: 19800000, image: 'https://picsum.photos/seed/cow16/400/300' },
+            { id: 17, type: 'SUPER', weight: 280, price: 22000000, image: 'https://picsum.photos/seed/cow17/400/300' },
+            { id: 18, type: 'SUPER', weight: 300, price: 23000000, image: 'https://picsum.photos/seed/cow18/400/300' },
+            { id: 19, type: 'A', weight: 192, price: 15300000, image: 'https://picsum.photos/seed/cow19/400/300' },
+            { id: 20, type: 'B', weight: 218, price: 17400000, image: 'https://picsum.photos/seed/cow20/400/300' },
+            { id: 21, type: 'A', weight: 196, price: 15400000, image: 'https://picsum.photos/seed/cow21/400/300' },
+            { id: 22, type: 'B', weight: 222, price: 17600000, image: 'https://picsum.photos/seed/cow22/400/300' },
+            { id: 23, type: 'C', weight: 242, price: 19400000, image: 'https://picsum.photos/seed/cow23/400/300' },
+            { id: 24, type: 'SUPER', weight: 290, price: 22500000, image: 'https://picsum.photos/seed/cow24/400/300' },
+            { id: 25, type: 'A', weight: 185, price: 15000000, image: 'https://picsum.photos/seed/cow25/400/300' },
+            { id: 26, type: 'B', weight: 212, price: 17100000, image: 'https://picsum.photos/seed/cow26/400/300' },
+            { id: 27, type: 'C', weight: 238, price: 19100000, image: 'https://picsum.photos/seed/cow27/400/300' },
+            { id: 28, type: 'SUPER', weight: 310, price: 23500000, image: 'https://picsum.photos/seed/cow28/400/300' },
+            { id: 29, type: 'A', weight: 199, price: 15700000, image: 'https://picsum.photos/seed/cow29/400/300' },
+            { id: 30, type: 'B', weight: 227, price: 17900000, image: 'https://picsum.photos/seed/cow30/400/300' },
+            { id: 31, type: 'A', weight: 188, price: 15100000, image: 'https://picsum.photos/seed/cow31/400/300' },
+            { id: 32, type: 'B', weight: 214, price: 17300000, image: 'https://picsum.photos/seed/cow32/400/300' },
+            { id: 33, type: 'C', weight: 248, price: 19700000, image: 'https://picsum.photos/seed/cow33/400/300' },
+            { id: 34, type: 'SUPER', weight: 320, price: 24000000, image: 'https://picsum.photos/seed/cow34/400/300' },
+            { id: 35, type: 'A', weight: 202, price: 15900000, image: 'https://picsum.photos/seed/cow35/400/300' },
+            { id: 36, type: 'B', weight: 232, price: 18100000, image: 'https://picsum.photos/seed/cow36/400/300' },
+            { id: 37, type: 'C', weight: 252, price: 19900000, image: 'https://picsum.photos/seed/cow37/400/300' },
+            { id: 38, type: 'SUPER', weight: 340, price: 25000000, image: 'https://picsum.photos/seed/cow38/400/300' },
+            { id: 39, type: 'A', weight: 194, price: 15500000, image: 'https://picsum.photos/seed/cow39/400/300' },
+            { id: 40, type: 'B', weight: 224, price: 17700000, image: 'https://picsum.photos/seed/cow40/400/300' },
+            { id: 41, type: 'A', weight: 191, price: 15300000, image: 'https://picsum.photos/seed/cow41/400/300' },
+            { id: 42, type: 'B', weight: 219, price: 17500000, image: 'https://picsum.photos/seed/cow42/400/300' },
+            { id: 43, type: 'C', weight: 239, price: 19300000, image: 'https://picsum.photos/seed/cow43/400/300' },
+            { id: 44, type: 'SUPER', weight: 270, price: 21500000, image: 'https://picsum.photos/seed/cow44/400/300' },
+            { id: 45, type: 'A', weight: 203, price: 16000000, image: 'https://picsum.photos/seed/cow45/400/300' },
+            { id: 46, type: 'B', weight: 233, price: 18200000, image: 'https://picsum.photos/seed/cow46/400/300' },
+            { id: 47, type: 'C', weight: 253, price: 20000000, image: 'https://picsum.photos/seed/cow47/400/300' },
+            { id: 48, type: 'SUPER', weight: 330, price: 24500000, image: 'https://picsum.photos/seed/cow48/400/300' },
+            { id: 49, type: 'A', weight: 189, price: 15200000, image: 'https://picsum.photos/seed/cow49/400/300' },
+            { id: 50, type: 'B', weight: 216, price: 17400000, image: 'https://picsum.photos/seed/cow50/400/300' },
+            { id: 51, type: 'A', weight: 186, price: 15050000, image: 'https://picsum.photos/seed/cow51/400/300' },
+            { id: 52, type: 'B', weight: 211, price: 17050000, image: 'https://picsum.photos/seed/cow52/400/300' },
+            { id: 53, type: 'C', weight: 237, price: 19150000, image: 'https://picsum.photos/seed/cow53/400/300' },
+            { id: 54, type: 'SUPER', weight: 295, price: 22800000, image: 'https://picsum.photos/seed/cow54/400/300' },
+            { id: 55, type: 'A', weight: 197, price: 15650000, image: 'https://picsum.photos/seed/cow55/400/300' },
+            { id: 56, type: 'B', weight: 228, price: 17950000, image: 'https://picsum.photos/seed/cow56/400/300' },
+            { id: 57, type: 'C', weight: 249, price: 19850000, image: 'https://picsum.photos/seed/cow57/400/300' },
+            { id: 58, type: 'SUPER', weight: 350, price: 26000000, image: 'https://picsum.photos/seed/cow58/400/300' },
+            { id: 59, type: 'A', weight: 193, price: 15450000, image: 'https://picsum.photos/seed/cow59/400/300' },
+            { id: 60, type: 'B', weight: 223, price: 17750000, image: 'https://picsum.photos/seed/cow60/400/300' },
+            { id: 61, type: 'A', weight: 187, price: 15150000, image: 'https://picsum.photos/seed/cow61/400/300' },
+            { id: 62, type: 'B', weight: 213, price: 17150000, image: 'https://picsum.photos/seed/cow62/400/300' },
+            { id: 63, type: 'C', weight: 241, price: 19350000, image: 'https://picsum.photos/seed/cow63/400/300' },
+            { id: 64, type: 'SUPER', weight: 305, price: 23200000, image: 'https://picsum.photos/seed/cow64/400/300' },
+            { id: 65, type: 'A', weight: 204, price: 15850000, image: 'https://picsum.photos/seed/cow65/400/300' },
+            { id: 66, type: 'B', weight: 234, price: 18050000, image: 'https://picsum.photos/seed/cow66/400/300' },
+            { id: 67, type: 'C', weight: 254, price: 19950000, image: 'https://picsum.photos/seed/cow67/400/300' },
+            { id: 68, type: 'SUPER', weight: 360, price: 27000000, image: 'https://picsum.photos/seed/cow68/400/300' },
+            { id: 69, type: 'A', weight: 195, price: 15550000, image: 'https://picsum.photos/seed/cow69/400/300' },
+            { id: 70, type: 'B', weight: 225, price: 17850000, image: 'https://picsum.photos/seed/cow70/400/300' },
+            { id: 71, type: 'A', weight: 190, price: 15250000, image: 'https://picsum.photos/seed/cow71/400/300' },
+            { id: 72, type: 'B', weight: 220, price: 17550000, image: 'https://picsum.photos/seed/cow72/400/300' },
+            { id: 73, type: 'C', weight: 246, price: 19650000, image: 'https://picsum.photos/seed/cow73/400/300' },
+            { id: 74, type: 'SUPER', weight: 315, price: 23800000, image: 'https://picsum.photos/seed/cow74/400/300' },
+            { id: 75, type: 'A', weight: 201, price: 15750000, image: 'https://picsum.photos/seed/cow75/400/300' },
+            { id: 76, type: 'B', weight: 231, price: 18150000, image: 'https://picsum.photos/seed/cow76/400/300' },
+            { id: 77, type: 'C', weight: 251, price: 20050000, image: 'https://picsum.photos/seed/cow77/400/300' },
+            { id: 78, type: 'SUPER', weight: 370, price: 28000000, image: 'https://picsum.photos/seed/cow78/400/300' },
+            { id: 79, type: 'A', weight: 192, price: 15350000, image: 'https://picsum.photos/seed/cow79/400/300' },
+            { id: 80, type: 'B', weight: 217, price: 17650000, image: 'https://picsum.photos/seed/cow80/400/300' },
+            { id: 81, type: 'A', weight: 188, price: 15200000, image: 'https://picsum.photos/seed/cow81/400/300' },
+            { id: 82, type: 'B', weight: 218, price: 17300000, image: 'https://picsum.photos/seed/cow82/400/300' },
+            { id: 83, type: 'C', weight: 243, price: 19400000, image: 'https://picsum.photos/seed/cow83/400/300' },
+            { id: 84, type: 'SUPER', weight: 325, price: 24200000, image: 'https://picsum.photos/seed/cow84/400/300' },
+            { id: 85, type: 'A', weight: 202, price: 15800000, image: 'https://picsum.photos/seed/cow85/400/300' },
+            { id: 86, type: 'B', weight: 232, price: 18000000, image: 'https://picsum.photos/seed/cow86/400/300' },
+            { id: 87, type: 'C', weight: 252, price: 19900000, image: 'https://picsum.photos/seed/cow87/400/300' },
+            { id: 88, type: 'SUPER', weight: 380, price: 29000000, image: 'https://picsum.photos/seed/cow88/400/300' },
+            { id: 89, type: 'A', weight: 194, price: 15400000, image: 'https://picsum.photos/seed/cow89/400/300' },
+            { id: 90, type: 'B', weight: 224, price: 17700000, image: 'https://picsum.photos/seed/cow90/400/300' },
+            { id: 91, type: 'A', weight: 199, price: 15600000, image: 'https://picsum.photos/seed/cow91/400/300' },
+            { id: 92, type: 'B', weight: 229, price: 17900000, image: 'https://picsum.photos/seed/cow92/400/300' },
+            { id: 93, type: 'C', weight: 247, price: 19700000, image: 'https://picsum.photos/seed/cow93/400/300' },
+            { id: 94, type: 'SUPER', weight: 400, price: 30000000, image: 'https://picsum.photos/seed/cow94/400/300' },
+            { id: 95, type: 'A', weight: 205, price: 16000000, image: 'https://picsum.photos/seed/cow95/400/300' },
+            { id: 96, type: 'B', weight: 235, price: 18200000, image: 'https://picsum.photos/seed/cow96/400/300' },
+            { id: 97, type: 'C', weight: 255, price: 20100000, image: 'https://picsum.photos/seed/cow97/400/300' },
+            { id: 98, type: 'SUPER', weight: 420, price: 32000000, image: 'https://picsum.photos/seed/cow98/400/300' },
+            { id: 99, type: 'A', weight: 196, price: 15500000, image: 'https://picsum.photos/seed/cow99/400/300' },
+            { id: 100, type: 'B', weight: 226, price: 17800000, image: 'https://picsum.photos/seed/cow100/400/300' }
+        ];
+
         // --- LOADING SCREEN LOGIC ---
         window.addEventListener('load', () => {
             const loader = document.getElementById('loading-screen');
@@ -1543,29 +1652,17 @@
             }
         }
 
-        // --- GENERATE 100 KARTU SAPI (UPDATE KATEGORI) ---
+        // --- GENERATE KARTU SAPI (MENGGUNAKAN DATA STATIS) ---
         function generateCows() {
             const container = document.getElementById('dynamicCowList');
             
-            // Definisi Kategori Baru (Type A, B, C, SUPER 1, SUPER 2)
-            const cowTypes = [
-                { name: 'A', weightMin: 185, weightMax: 205, priceMin: 15000000, priceMax: 16000000 },
-                { name: 'B', weightMin: 206, weightMax: 235, priceMin: 17000000, priceMax: 18000000 },
-                { name: 'C', weightMin: 236, weightMax: 255, priceMin: 19000000, priceMax: 20000000 },
-                { name: 'SUPER', weightMin: 256, weightMax: 305, priceMin: 21000000, priceMax: 23000000, label: 'SUPER' },
-                { name: 'SUPER', weightMin: 326, weightMax: 455, priceMin: 24000000, priceMax: 30000000, label: 'SUPER' }
-            ];
-            
-            for (let i = 1; i <= 100; i++) {
-                // Pilih kategori secara acak
-                const randomTypeIndex = Math.floor(Math.random() * cowTypes.length);
-                const selectedType = cowTypes[randomTypeIndex];
-                
-                // Hitung bobot acak dalam rentang kategori tersebut
-                const weight = Math.floor(Math.random() * (selectedType.weightMax - selectedType.weightMin + 1)) + selectedType.weightMin;
-                
-                // Hitung harga acak dalam rentang harga kategori tersebut
-                const price = Math.floor(Math.random() * (selectedType.priceMax - selectedType.priceMin + 1)) + selectedType.priceMin;
+            cowData.forEach(data => {
+                // Ambil data dari array cowData
+                const id = data.id;
+                const selectedType = data.type;
+                const weight = data.weight;
+                const price = data.price;
+                const imgSrc = data.image;
                 
                 // Format angka
                 const priceFormatted = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(price);
@@ -1574,8 +1671,8 @@
                 const card = document.createElement('div');
                 card.className = 'template-card';
                 // Tambahkan data attribute untuk filter & sorting
-                card.setAttribute('data-type', selectedType.name);
-                card.setAttribute('data-id', i.toString().padStart(3, '0'));
+                card.setAttribute('data-type', selectedType);
+                card.setAttribute('data-id', id.toString().padStart(3, '0'));
                 // TAMBAHAN: Raw attributes untuk sorting
                 card.setAttribute('data-raw-price', price);
                 card.setAttribute('data-raw-weight', weight);
@@ -1583,32 +1680,32 @@
                 // Struktur HTML
                 card.innerHTML = `
                     <div class="template-preview">
-                        <img src="https://picsum.photos/seed/cow${i}/400/300" alt="${selectedType.name}">
+                        <img src="${imgSrc}" alt="${selectedType}">
                     </div>
                     <div class="template-info">
-                        <h3>Sapi Type ${selectedType.name} #${i.toString().padStart(3, '0')}</h3>
+                        <h3>Sapi Type ${selectedType} #${id.toString().padStart(3, '0')}</h3>
                         <p>Bobot: ${weight} Kg</p>
                         <div class="template-action">
                             <span class="price-tag">${priceFormatted}</span>
                             <div style="display: flex; gap: 5px; align-items: center;">
                                 <button class="btn-canva btn-ghost btn-detail" 
                                             onclick="openDetail(this)" 
-                                            data-type="${selectedType.name}" 
+                                            data-type="${selectedType}" 
                                             data-weight="${weight} Kg" 
                                             data-price="${priceFormatted}"
-                                            data-img="https://picsum.photos/seed/cow${i}/400/300"
+                                            data-img="${imgSrc}"
                                             title="Lihat Detail">
                                     <i class="fas fa-info-circle"></i>
                                 </button>
                                 <button class="btn-canva btn-ghost" style="padding: 4px 8px; font-size: 0.8rem;" 
-                                            onclick="openCheckout('Sapi Type ${selectedType.name} #${i.toString().padStart(3, '0')}', ${price})">Beli</button>
+                                            onclick="openCheckout('Sapi Type ${selectedType} #${id.toString().padStart(3, '0')}', ${price})">Beli</button>
                             </div>
                         </div>
                     </div>
                 `;
                 
                 container.appendChild(card);
-            }
+            });
         }
 
         // --- FITUR SORTING ---
