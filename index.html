@@ -59,7 +59,7 @@
             color: var(--text-dark);
             height: 100vh;
             overflow: hidden;
-            display: flex; /* Default Flexbox (Row) agar sidebar muncul di kiri */
+            display: flex;
             transition: background-color 0.3s ease, color 0.3s ease;
         }
 
@@ -92,7 +92,7 @@
         }
 
         .sidebar-logo {
-            color: var(--primary); /* Logo warna hijau */
+            color: var(--primary);
             font-size: 1.8rem;
             margin-bottom: 2rem;
             cursor: pointer;
@@ -109,7 +109,7 @@
             font-size: 1.2rem;
             margin-bottom: 0.8rem;
             cursor: pointer;
-            transition: var(--transition);
+            transition: 0.2s;
             position: relative;
         }
 
@@ -201,7 +201,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-            transition: var(--transition);
+            transition: 0.2s;
             font-family: 'Poppins', sans-serif;
         }
 
@@ -212,7 +212,7 @@
         .btn-ghost:hover { background: rgba(255, 255, 255, 0.1); }
 
         .btn-primary {
-            background: linear-gradient(90deg, #d97706 0%, #f59e0b 100%); /* Amber Gradient */
+            background: linear-gradient(90deg, #d97706 0%, #f59e0b 100%);
             color: white;
             box-shadow: 0 2px 4px rgba(217, 119, 6, 0.3);
         }
@@ -337,11 +337,61 @@
             align-items: center;
             justify-content: space-between;
             margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 10px;
         }
         .section-title {
             font-size: 1.25rem;
             font-weight: 700;
             color: var(--text-dark);
+        }
+
+        /* FILTER BAR STYLES */
+        .filter-bar {
+            display: flex;
+            gap: 10px;
+            background: var(--panel-bg);
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid var(--text-light);
+            flex: 1;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid var(--text-light);
+            border-radius: 6px;
+            background: var(--workspace-bg);
+            color: var(--text-dark);
+            font-family: inherit;
+            min-width: 200px;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--text-light);
+            border-radius: 6px;
+            background: var(--workspace-bg);
+            color: var(--text-dark);
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        /* NO RESULTS STATE */
+        .no-results-msg {
+            display: none;
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+            width: 100%;
+        }
+        .no-results-msg i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: var(--text-light);
+            opacity: 0.5;
         }
 
         /* Mode 1: Horizontal Scroller (Default) */
@@ -377,6 +427,11 @@
             height: 100%;
             display: flex;
             flex-direction: column;
+        }
+        
+        /* Helper class for filtering */
+        .template-card.hidden-card {
+            display: none !important;
         }
 
         .template-card:hover {
@@ -757,9 +812,70 @@
             box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
         }
 
+        /* BACK TO TOP BUTTON */
+        .btn-back-top {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            background: var(--primary);
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-md);
+            cursor: pointer;
+            z-index: 1900;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            border: none;
+        }
+        
+        .btn-back-top.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .btn-back-top:hover {
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+        }
+
+        /* LOADING OVERLAY */
+        #loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--workspace-bg);
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--text-light);
+            border-top: 5px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
         /* --- RESPONSIVE --- */
         @media (max-width: 1024px) {
             .panel-row, .checkout-container { grid-template-columns: 1fr; }
+            .filter-bar { justify-content: space-between; }
         }
 
         @media (max-width: 768px) {
@@ -800,6 +916,15 @@
                 width: 50px;
                 height: 50px;
                 font-size: 20px;
+            }
+
+            /* Back to Top adjust */
+            .btn-back-top {
+                bottom: 80px;
+                left: 20px;
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
             }
 
             /* Add margin to footer so it doesn't hide behind bottom nav on short pages */
@@ -854,6 +979,12 @@
 </head>
 <body>
 
+    <!-- UPDATE: LOADING SCREEN -->
+    <div id="loading-screen">
+        <div class="loader-spinner"></div>
+        <h3 style="color: var(--primary);">Memuat Kandang...</h3>
+    </div>
+
     <div class="bg-pattern"></div>
 
     <!-- SIDEBAR -->
@@ -894,7 +1025,7 @@
                     <i class="fas fa-moon" id="themeIcon"></i>
                 </button>
 
-                <!-- UPDATE: 2 Tombol WhatsApp di Top Bar -->
+                <!-- 2 Tombol WhatsApp di Top Bar -->
                 <div style="display: flex; gap: 0.5rem;">
                     <a href="https://wa.me/6285893107859?text=Halo%20Pak%20Mahmud,%20saya%20tertarik%20membeli%20sapi%20kurban." 
                        target="_blank" 
@@ -944,7 +1075,6 @@
                         <button class="btn-canva btn-primary" onclick="document.getElementById('services').scrollIntoView({behavior: 'smooth'})">
                             Pilih Sapi Sekarang
                         </button>
-                        <!-- PERUBAHAN DISINI: Menambahkan onclick untuk scroll ke galeri -->
                         <button class="btn-canva btn-ghost" style="border: 1px solid var(--text-light);" onclick="document.getElementById('galeri-kandang').scrollIntoView({behavior: 'smooth'})">
                             Lihat Video
                         </button>
@@ -956,13 +1086,40 @@
                     <div class="section-header">
                         <h2 class="section-title">Katalog Sapi <span class="badge-pro">TERSEDIA</span></h2>
                         
-                        <!-- UPDATE: Tombol View All (Switch Mode) -->
+                        <!-- Tombol View All (Switch Mode) -->
                         <button class="btn-canva btn-primary" onclick="toggleViewAll(this)" id="btnViewToggle">
                             Lihat Semua <i class="fas fa-th-large"></i>
                         </button>
                     </div>
 
-                    <!-- UPDATE: Container Kosong yang akan diisi oleh JS -->
+                    <!-- FITUR PENCARIAN, FILTER & SORTING -->
+                    <div class="filter-bar">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Cari kode sapi..." onkeyup="filterCows()">
+                        <select id="typeFilter" class="filter-select" onchange="filterCows()">
+                            <option value="all">Semua Tipe</option>
+                            <option value="A">Type A</option>
+                            <option value="B">Type B</option>
+                            <option value="C">Type C</option>
+                            <option value="SUPER">Super</option>
+                        </select>
+                        <!-- SORTING DROPDOWN -->
+                        <select id="sortSelect" class="filter-select" onchange="sortCows()">
+                            <option value="default">Urutkan...</option>
+                            <option value="price-asc">Harga Termurah</option>
+                            <option value="price-desc">Harga Termahal</option>
+                            <option value="weight-asc">Bobot Terkecil</option>
+                            <option value="weight-desc">Bobot Terbesar</option>
+                        </select>
+                    </div>
+
+                    <!-- NO RESULTS MESSAGE -->
+                    <div id="noResultsMsg" class="no-results-msg">
+                        <i class="fas fa-search"></i>
+                        <h3>Tidak ditemukan</h3>
+                        <p>Coba ubah kata kunci atau filter pencarian Anda.</p>
+                    </div>
+
+                    <!-- Container Kosong yang akan diisi oleh JS -->
                     <div id="dynamicCowList" class="template-scroller">
                         <!-- Javascript akan mengisi 100 kartu di sini -->
                     </div>
@@ -971,7 +1128,6 @@
                 <!-- DASHBOARD / PANEL ROW -->
                 <div class="panel-row">
                     <!-- Left: Kondisi Kandang / Galeri -->
-                    <!-- PERUBAHAN DISINI: Menambahkan id="galeri-kandang" -->
                     <div class="content-panel" id="galeri-kandang">
                         <div class="section-header">
                             <h2 class="section-title">Galeri Kandang</h2>
@@ -983,10 +1139,17 @@
                                 <span style="font-size: 0.85rem; font-weight: 600; color: var(--text-dark);"><i class="fas fa-video" style="color: #000000; margin-right: 5px;"></i> Video Kandang</span>
                                 <button style="border: none; background: none; color: var(--text-light); cursor: pointer;"><i class="fas fa-expand"></i></button>
                             </div>
-                            <video width="100%" height="250px" controls style="background: #000; outline: none; border-radius: 0 0 8px 8px;">
+                            
+                            <video width="100%" height="250px" controls style="background: #000; outline: none; border-radius: 0 0 8px 8px;" onerror="this.style.display='none'; document.getElementById('videoFallback').style.display='flex';">
                                 <source src="video pemasaran.mp4" type="video/mp4">
                                 Browser Anda tidak mendukung tag video.
                             </video>
+                            
+                            <!-- Fallback jika video error/hilang -->
+                            <div id="videoFallback" style="display:none; width: 100%; height: 250px; background: #333; color: #fff; align-items: center; justify-content: center; flex-direction: column; border-radius: 0 0 8px 8px;">
+                                <i class="fas fa-video-slash" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                                <p>Video tidak tersedia saat ini</p>
+                            </div>
                         </div>
 
                         <h3 style="margin-bottom: 1rem; font-size: 1rem; color: var(--text-dark);">Dokumentasi Pengiriman</h3>
@@ -1006,6 +1169,15 @@
                             <div style="aspect-ratio: 1; background: #eee; border-radius: 8px; overflow: hidden; position: relative;">
                                 <img src="https://picsum.photos/seed/dok4/150/150" alt="Dok" style="width: 100%; height: 100%; object-fit: cover;">
                                 <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; font-size: 0.7rem; padding: 4px;">Checkup Rutin</div>
+                            </div>
+                            <!-- TAMBAHAN 2 DOKUMENTASI BARU -->
+                            <div style="aspect-ratio: 1; background: #eee; border-radius: 8px; overflow: hidden; position: relative;">
+                                <img src="https://picsum.photos/seed/dok5/150/150" alt="Dok" style="width: 100%; height: 100%; object-fit: cover;">
+                                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; font-size: 0.7rem; padding: 4px;">Area Tangerang</div>
+                            </div>
+                            <div style="aspect-ratio: 1; background: #eee; border-radius: 8px; overflow: hidden; position: relative;">
+                                <img src="https://picsum.photos/seed/dok6/150/150" alt="Dok" style="width: 100%; height: 100%; object-fit: cover;">
+                                <div style="position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.6); color: white; font-size: 0.7rem; padding: 4px;">Area Bogor</div>
                             </div>
                         </div>
                     </div>
@@ -1301,6 +1473,11 @@
         </a>
     </div>
 
+    <!-- BACK TO TOP BUTTON -->
+    <button id="btnBackTop" class="btn-back-top" onclick="scrollToTop()" title="Kembali ke Atas">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
     <!-- SUCCESS MODAL -->
     <div class="modal-overlay" id="successModal">
         <div class="modal-card">
@@ -1340,6 +1517,15 @@
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
+        // --- LOADING SCREEN LOGIC ---
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loading-screen');
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500);
+        });
+
         // --- THEME TOGGLE ---
         function toggleTheme() {
             const body = document.body;
@@ -1387,6 +1573,12 @@
                 // Create Element HTML untuk Kartu
                 const card = document.createElement('div');
                 card.className = 'template-card';
+                // Tambahkan data attribute untuk filter & sorting
+                card.setAttribute('data-type', selectedType.name);
+                card.setAttribute('data-id', i.toString().padStart(3, '0'));
+                // TAMBAHAN: Raw attributes untuk sorting
+                card.setAttribute('data-raw-price', price);
+                card.setAttribute('data-raw-weight', weight);
                 
                 // Struktur HTML
                 card.innerHTML = `
@@ -1417,6 +1609,83 @@
                 
                 container.appendChild(card);
             }
+        }
+
+        // --- FITUR SORTING ---
+        function sortCows() {
+            const list = document.getElementById('dynamicCowList');
+            const sortValue = document.getElementById('sortSelect').value;
+            const cards = Array.from(list.getElementsByClassName('template-card'));
+            
+            // Filter out hidden cards first (don't sort hidden ones)
+            const visibleCards = cards.filter(card => !card.classList.contains('hidden-card'));
+            
+            if (sortValue === 'default') {
+                // Reset to original generation order roughly (by ID)
+                visibleCards.sort((a, b) => {
+                    return parseInt(a.getAttribute('data-id')) - parseInt(b.getAttribute('data-id'));
+                });
+            } else if (sortValue === 'price-asc') {
+                visibleCards.sort((a, b) => {
+                    return parseInt(a.getAttribute('data-raw-price')) - parseInt(b.getAttribute('data-raw-price'));
+                });
+            } else if (sortValue === 'price-desc') {
+                visibleCards.sort((a, b) => {
+                    return parseInt(b.getAttribute('data-raw-price')) - parseInt(a.getAttribute('data-raw-price'));
+                });
+            } else if (sortValue === 'weight-asc') {
+                visibleCards.sort((a, b) => {
+                    return parseInt(a.getAttribute('data-raw-weight')) - parseInt(b.getAttribute('data-raw-weight'));
+                });
+            } else if (sortValue === 'weight-desc') {
+                visibleCards.sort((a, b) => {
+                    return parseInt(b.getAttribute('data-raw-weight')) - parseInt(a.getAttribute('data-raw-weight'));
+                });
+            }
+
+            // Re-append sorted cards
+            visibleCards.forEach(card => list.appendChild(card));
+        }
+
+        // --- FITUR PENCARIAN & FILTER ---
+        function filterCows() {
+            const input = document.getElementById('searchInput');
+            const filter = document.getElementById('typeFilter');
+            const cards = document.getElementsByClassName('template-card');
+            const noResults = document.getElementById('noResultsMsg');
+            
+            const searchText = input.value.toLowerCase();
+            const selectedType = filter.value;
+
+            let visibleCount = 0;
+
+            for (let i = 0; i < cards.length; i++) {
+                const card = cards[i];
+                const title = card.querySelector('h3').innerText.toLowerCase();
+                const id = card.getAttribute('data-id');
+                const type = card.getAttribute('data-type');
+
+                // Cek apakah kartu match dengan filter Type dan Search Text
+                const matchType = (selectedType === 'all' || type === selectedType);
+                const matchSearch = (title.includes(searchText) || id.includes(searchText));
+
+                if (matchType && matchSearch) {
+                    card.classList.remove('hidden-card');
+                    visibleCount++;
+                } else {
+                    card.classList.add('hidden-card');
+                }
+            }
+
+            // Tampilkan/Sembunyikan pesan No Results
+            if (visibleCount === 0) {
+                noResults.style.display = 'block';
+            } else {
+                noResults.style.display = 'none';
+            }
+            
+            // Re-apply sort after filtering to keep order within visible items
+            // Optional, but good UX. Let's just keep sort manual.
         }
 
         // --- TOGGLE VIEW ALL (FITUR BARU) ---
@@ -1634,6 +1903,22 @@
         }
 
         quickContactForm.addEventListener("submit", handleContactSubmit);
+
+        // --- SCROLL & BACK TO TOP ---
+        function scrollToTop() {
+            document.querySelector('.workspace').scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const workspace = document.querySelector('.workspace');
+        const btnBackTop = document.getElementById('btnBackTop');
+
+        workspace.addEventListener('scroll', () => {
+            if (workspace.scrollTop > 300) {
+                btnBackTop.classList.add('show');
+            } else {
+                btnBackTop.classList.remove('show');
+            }
+        });
 
         // --- TOAST SYSTEM ---
         function showToast(message) {
